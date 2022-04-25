@@ -118,6 +118,7 @@ function initBrowserSync() {
       `${paths.templates}/*.html`
     ], {
       // https://www.browsersync.io/docs/options/#option-proxy
+      open: false,
       proxy:  {
         target: '127.0.0.1:8000',
         proxyReq: [

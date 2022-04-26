@@ -72,12 +72,18 @@ DJANGO_APPS = [
     "django.forms",
 ]
 THIRD_PARTY_APPS = [
+    'django_comments_xtd',
+    'django_comments',
     "crispy_forms",
-    "crispy_bootstrap5",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "rest_framework",
+    "django_bootstrap_breadcrumbs",
+    "django_summernote",
+    "django_filters",
     "django_celery_beat",
+    "django_celery_results",
 ]
 
 LOCAL_APPS = [

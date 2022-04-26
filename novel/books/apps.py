@@ -2,5 +2,11 @@ from django.apps import AppConfig
 
 
 class BooksConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'books'
+    name = 'novel.books'
+    verbose_name = "books"
+
+    def ready(self):
+        try:
+            import novel2read.apps.books.signals  # noqa F401
+        except ImportError:
+            pass

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+  {% if request.resolver_match.url_name == 'genre-list' %}
+    Genres
+  {% else %}
+    {% for bookgenre in bookgenres %}
+      {% if request.path == bookgenre.get_absolute_url %}
+        {{bookgenre.name}}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+   - {{block.super}}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+
+  <div class="browsebooks mt-30">
+    <div class="browsebooks__title">
+      <h1 class="h1-title">
+        {% if request.resolver_match.url_name == 'genre-list' %}
+          All Genres
+        {% else %}
+          {% for bookgenre in bookgenres %}
+            {% if request.path == bookgenre.get_absolute_url %}
+              {{bookgenre.name}}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      </h1>
+    </div>
+    <div class="browsebooks__filters mb-30">
+      <h2 class="h2-title-sm filters-dropdown">
+        Filters<span><i class="fas fa-caret-down"></i></span>
+      </h2>
+      <form action="" method="get" class="browsebooks__filters--form js-filter-form" style="display: none;">
+          {{ f_form.as_p}}
+      </form>
+    </div>
+    <div class="browsebooks__books">
+      {% with books=f_books %}
+        {% include 'books/book_lg_wide_list.html' %}
+      {% endwith %}
+    </div>
+  </div>
+
+  {% include 'components/pagination.html' %}
+
+</div> <!-- Container -->
+{% endblock content %}

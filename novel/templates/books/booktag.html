@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+  {% if tag_name %}{{tag_name}}{% else %}Tags{% endif %} - {{block.super}}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="browsetags mt-30">
+    <div class="browsetags__title">
+      <h1 class="h1-title">
+        {% if tag_name %}{{tag_name}}{% else %}All Tags{% endif %}
+      </h1>
+    </div>
+    <div class="browsetags__tag-nav ">
+      <h2 class="h2-title-sm tags-dropdown">
+        Tags<span><i class="fas fa-caret-down"></i></span>
+      </h2>
+      <nav class="js-tags-nav" {% if tag_name %}style="display: none;"{% endif %}>
+        <ul>
+          <li>
+            <input class="form-control js-livesearch-input mb-30" type="text" placeholder="Search Tag"></li>
+          </li>
+        </ul>
+        <ul class="js-livesearch-container">
+          {% for tag in tags %}
+            <li class="js-livesearch-item tag-card{% if request.path == tag.get_absolute_url %} active{% endif %}">
+              <a href="{{tag.get_absolute_url}}">{{tag.name}}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div class="browsetags__filters mb-30" {% if not tag_name %}style="display: none;"{% endif %}>
+    <h2 class="h2-title-sm filters-dropdown">
+      Filters<span><i class="fas fa-caret-down"></i></span>
+    </h2>
+    <form action="" method="get" class="browsebooks__filters--form js-filter-form" style="display: none;">
+        {{ f_form.as_p}}
+    </form>
+  </div>
+
+  <div class="browsebooks">
+    <div class="browsebooks__books">
+      {% with books=f_books %}
+        {% include 'books/book_lg_wide_list.html' %}
+      {% endwith %}
+    </div>
+  </div>
+
+  {% include 'components/pagination.html' %}
+
+</div> <!-- Container -->
+
+{% endblock content %}

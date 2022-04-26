@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Library - {{block.super}}{% endblock %}
+
+{% block content %}
+
+{% include 'components/csrf_gen_form.html' %}
+
+<div class="container">
+  <div class="librowse mt-30">
+    <div class="librowse__title">
+      <h1 class="h1-title">Library</h1>
+      <input class="form-control js-livesearch-input" type="text" placeholder="Search Book">
+    </div>
+    <div class="librowse__books">
+      {% include 'users/book_libcard_list.html' %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

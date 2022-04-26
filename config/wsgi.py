@@ -17,7 +17,9 @@ import os
 import sys
 from pathlib import Path
 
+from django.conf import settings
 from django.core.wsgi import get_wsgi_application
+from whitenoise import WhiteNoise
 
 # This allows easy placement of apps within the interior
 # novel directory.
@@ -33,6 +35,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
 application = get_wsgi_application()
+if os.environ.get("DJANGO_SETTINGS_MODULE") == "config.settings.production":
+    application = WhiteNoise(application, root=settings.STATIC_ROOT)
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication
 # application = HelloWorldApplication(application)

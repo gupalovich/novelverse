@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}{{page_title}} - {{block.super}}{% endblock %}
+
+{% block content %}
+
+{% include 'components/csrf_gen_form.html' %}
+
+<div class="container">
+
+  <div class="bookranking mt-30">
+    <div class="bookranking__title">
+      <h1 class="h1-title">{{page_title}}</h1>
+    </div>
+    <div class="bookranking__cards">
+      <div class="row infinite-container">
+        {% for book in books_top %}
+          <div class="col-lg-4 col-md-6 col-sm-12 bookranking__cards__card">
+            <div class="rankcard">
+              <div class="rankcard__rank">
+                <span>{{book.ranking}}</span>
+              </div>
+              <div class="rankcard__poster">
+                <img src="{{book.poster.url}}" alt="{{book.title}}" loading="lazy">
+              </div>
+              <div class="rankcard__info">
+                <h2 class="h2-title-sm">
+                {% with bt=book.title %}
+                  {% if bt|length >= 28 %}
+                    {{bt|truncatechars:28}}
+                  {% else %}
+                    {{bt}}
+                  {% endif %}
+                {% endwith %}
+                </h2>
+                <div class="book-lg-wide__info--stars stars-rating-sm">
+                  <img src="{% static 'images/star.png' %}" alt="star">
+                  <img src="{% static 'images/star.png' %}" alt="star">
+                  <img src="{% static 'images/star.png' %}" alt="star">
+                  <img src="{% static 'images/star.png' %}" alt="star">
+                  <img src="{% static 'images/half-star.png' %}" alt="star">
+                  <span>{{book.rating}}</span>
+                </div>
+              </div>
+              <div class="rankcard__nav">
+                <div class="rankcard-wide__nav--votes ">Votes: <span class="js-bvotes">{{book.votes}}</span></div>
+
+                {% include 'books/vote-btn-ajax.html' %}
+
+                <a href="{{book.get_absolute_url}}">
+                  <button class="btn btn-outline-primary">Read</button>
+                </a>
+                {% include 'books/lib-btn-ajax.html' %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+        {% for book in books %}
+          <div class="col-md-12 infinite-item">
+            <div class="rankcard-wide">
+              <div class="rankcard-wide__rank">
+                <span>{{book.ranking}}</span>
+              </div>
+              <div class="rankcard-wide__poster">
+                <img src="{{book.poster.url}}" alt="{{book.title}}" loading="lazy">
+              </div>
+              <div class="rankcard-wide__info">
+                <h2 class="h2-title-sm">
+                  {{book.title}}
+                </h2>
+                <div class="rankcard-wide__info--stars stars-rating-sm">
+                  <img src="{% static 'images/star.png' %}" alt="star">
+                  <img src="{% static 'images/star.png' %}" alt="star">
+                  <img src="{% static 'images/star.png' %}" alt="star">
+                  <img src="{% static 'images/star.png' %}" alt="star">
+                  <img src="{% static 'images/half-star.png' %}" alt="star">
+                  <span>{{book.rating}}</span>
+                </div>
+                <div class="rankcard-wide__info--nav">
+                  <a class="read-book" href="{{book.get_absolute_url}}">
+                    <span>Read</span>
+                  </a>
+                  <span>|</span>
+                  {% include 'books/lib-btn-ajax.html' %}
+                </div>
+              </div>
+              <div class="rankcard-wide__nav">
+                <div class="rankcard-wide__nav--votes">Votes: <span class="js-bvotes">{{book.votes}}</span></div>
+
+                {% include 'books/vote-btn-ajax.html' %}
+
+                <a class="read-book" href="{{book.get_absolute_url}}">
+                  <button class="btn btn-outline-primary">Read</button>
+                </a>
+                {% include 'books/lib-btn-ajax.html' %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% with margin='mb-30' %}
+    {% include 'components/loader-dots.html' %}
+  {% endwith %}
+
+  {% if books.has_next %}
+    <a class="infinite-more-link mb-30"
+       href="?page={{ books.next_page_number }}">
+       <button class="btn btn-dark" style="display:none;">More</button>
+    </a>
+  {% endif %}
+
+
+</div> <!-- Container -->
+{% endblock content %}

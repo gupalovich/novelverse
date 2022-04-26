@@ -1,0 +1,27 @@
+<div class="bookmark">
+  {% if user.is_authenticated %}
+    {% if bookchapter.book in user_lib %}
+      <button
+        type="submit" class="btn js-lib-btn"
+        data-lib-url="{% url 'users:lib-add-remove-ajax' bookchapter.book.slug %}"
+        data-lib-in=1
+        data-bookmark=true>
+          <i class="fas fa-bookmark"></i>
+      </button>
+    {% else %}
+      <button
+        type="submit" class="btn js-lib-btn"
+        data-lib-url="{% url 'users:lib-add-remove-ajax' bookchapter.book.slug %}"
+        data-lib-in=0
+        data-bookmark=true>
+          <i class="far fa-bookmark"></i>
+      </button>
+    {% endif %}
+  {% else %}
+    <a href="{% url 'account_login' %}?next={{request.path}}">
+      <button class="btn">
+        <i class="far fa-bookmark"></i>
+      </button>
+    </a>
+  {% endif %}
+</div>

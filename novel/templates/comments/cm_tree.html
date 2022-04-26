@@ -1,0 +1,49 @@
+{% load comments %}
+{% load comments_xtd %}
+
+<div class="comments mb-50">
+  {% get_comment_count for object as comment_count %}
+
+  <div class="comments__count">
+    <h5 class="comments__count--title">
+      {% with comment_count=comment_count %}
+        {{ comment_count }} comments
+      {% endwith %}
+    </h5>
+    <div class="comments__count--filter">
+      <div class="btn-group">
+<!--           <div class="btn btn-link"
+             data-toggle="tooltip"
+             data-placement="top"
+             title="Sort by Likes">
+          <i class="fas fa-thumbs-up"></i>
+        </div> -->
+        <div class="btn btn-link js-filter-reverse"
+             data-toggle="tooltip"
+             data-placement="top"
+             title="Sort by Time">
+          <i class="fas fa-clock"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr/>
+
+  {% if object.allow_comments %}
+    <div class="comments__form">
+      {% render_comment_form for object %}
+    </div>
+  {% else %}
+    <div class="comments__form--disabled mt-30 mb-30">
+      <h5 class="text-center">Comments are disabled for this article.</h5>
+    </div>
+  {% endif %}
+
+  {% if comment_count %}
+    <div class="comments__tree js-reverse-content">
+      {% render_xtdcomment_tree for object using django_comments_xtd/comments_tree.html %}
+    </div>
+  {% endif %}
+
+</div>

@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block title %}{{b_chap.c_id}}: {{b_chap.title}} - {{b_chap.book}} - {{block.super}}{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb b_chap.book.title b_chap.book.get_absolute_url %}
+    {% breadcrumb b_chap.title b_chap.get_absolute_url %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% include 'components/csrf_gen_form.html' %}
+
+  {% render_breadcrumbs %}
+  <div class="bookchapter">
+
+    <div class="bookchapter__nav js-b-chap">
+      <div class="bookchapter__nav--link">
+        <a href="{{prev_chap.absolute_url}}" {% if prev_chap == None %}class="disabled"{% endif %}>
+          <button type="button" class="btn btn-dark">
+            <i class="far fa-long-arrow-left"></i>
+          </button>
+        </a>
+      </div>
+      <div class="bookchapter__nav--link">
+        <a href="{{next_chap.absolute_url}}" {% if next_chap == None %}class="disabled"{% endif %}>
+          <button type="button" class="btn btn-dark">
+            <i class="far fa-long-arrow-right"></i>
+          </button>
+        </a>
+      </div>
+
+      <div class="bookchapter__nav--select">
+        <div class="chaps">
+          <button class="chaps--toggle btn js-load-chaps"
+                  id="chaps-toggle"
+                  data-url-chaps="{{b_chap.get_absolute_url}}"
+                  data-loaded=0>
+            <i class="fas fa-list"></i></button>
+          <ul class="chaps--nav js-chap-container scrollbar" id="chaps-nav">
+            {% include 'components/loader-dots.html' %}
+          </ul>
+        </div>
+
+        {% with bookchapter=b_chap %}
+          {% include 'books/lib-bookmark-btn-ajax.html' %}
+        {% endwith %}
+
+        <div class="bookchapter__styles chap-styles">
+          <button class="btn" id="stylesBtn">
+            <i class="fas fa-cog"></i>
+          </button>
+          <div class="styles" id="stylesMenu">
+            <div class="styles--row">
+              <h4 class="h4-title-sm">
+                Color theme:
+              </h4>
+              <button
+                class="btn btn-dark btn-ctm js-theme" id="lightTheme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-color="tm-color-light">
+                <i class="fas fa-sun"></i>
+              </button>
+              <button
+                class="btn btn-dark btn-ctm js-theme" id="darkTheme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-color="tm-color-dark">
+                <i class="fas fa-moon"></i>
+              </button>
+            </div>
+            <div class="styles--row">
+              <h4 class="h4-title-sm">
+                Font:
+              </h4>
+<!--               <button
+                class="btn btn-dark js-theme" id="tm-font-arial"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-font="tm-font-arial">
+                <i class="fas fa-font"></i>
+                Arial
+              </button> -->
+              <button
+                class="btn btn-dark js-theme" id="tm-font-nunito"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-font="tm-font-nunito">
+                <i class="fas fa-font"></i>
+                Nunito
+              </button>
+              <button
+                class="btn btn-dark js-theme" id="tm-font-roboto"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-font="tm-font-roboto">
+                <i class="fas fa-font"></i>
+                Roboto
+              </button>
+              <button
+                class="btn btn-dark js-theme" id="tm-font-lora"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-font="tm-font-lora">
+                <i class="fas fa-font"></i>
+                Lora
+              </button>
+            </div>
+            <div class="styles--row">
+              <h4 class="h4-title-sm">
+                Font size:
+              </h4>
+              <button
+                class="btn btn-dark js-theme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-fz="tm-fz-18">
+                <i class="fas fa-pen-fancy"></i>
+                18px
+              </button>
+              <button
+                class="btn btn-dark js-theme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-fz="tm-fz-17">
+                <i class="fas fa-pen-fancy"></i>
+                17px
+              </button>
+              <button
+                class="btn btn-dark js-theme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-fz="tm-fz-16">
+                <i class="fas fa-pen-fancy"></i>
+                16px
+              </button>
+              <button
+                class="btn btn-dark js-theme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-fz="tm-fz-15">
+                <i class="fas fa-pen-fancy"></i>
+                15px
+              </button>
+              <button
+                class="btn btn-dark js-theme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-fz="tm-fz-14">
+                <i class="fas fa-pen-fancy"></i>
+                14px
+              </button>
+            </div>
+            <div class="styles--row">
+              <h4 class="h4-title-sm">
+                Margin:
+              </h4>
+              <button
+                class="btn btn-dark js-theme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-lh="tm-lh-20">
+                <i class="fas fa-text-height"></i>
+                20px
+              </button>
+              <button
+                class="btn btn-dark js-theme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-lh="tm-lh-15">
+                <i class="fas fa-text-height"></i>
+                15px
+              </button>
+              <button
+                class="btn btn-dark js-theme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-lh="tm-lh-10">
+                <i class="fas fa-text-height"></i>
+                10px
+              </button>
+              <button
+                class="btn btn-dark js-theme"
+                data-theme-url="{% url 'books:session-theme-ajax' %}"
+                data-theme-lh="tm-lh-5">
+                <i class="fas fa-text-height"></i>
+                5px
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bookchapter__title">
+      <h1 class="h1-title-sm">Chapter {{b_chap.c_id}}: {{b_chap.title}}</h1>
+    </div>
+
+    <div class="bookchapter__body">
+      {{b_chap.text|safe}}
+    </div>
+
+    <div class="bookchapter__nav">
+      <div class="bookchapter__nav--link">
+        <a href="{{prev_chap.absolute_url}}" {% if prev_chap == None %}class="disabled"{% endif %}>
+          <button type="button" class="btn btn-dark">
+            <i class="far fa-long-arrow-left"></i>
+          </button>
+        </a>
+      </div>
+      <div class="bookchapter__nav--link">
+        <a href="{{next_chap.absolute_url}}" {% if next_chap == None %}class="disabled"{% endif %}>
+          <button type="button" class="btn btn-dark">
+            <i class="far fa-long-arrow-right"></i>
+          </button>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  {% with object=b_chap %}
+    {% include 'comments/cm_tree.html' %}
+  {% endwith %}
+
+</div> <!-- Container -->
+{% endblock content %}
+
+{% block javascript %}
+  {{ block.super }}
+  <script src="{% static 'js/bookchapter.js' %}"></script>
+{% endblock javascript %}

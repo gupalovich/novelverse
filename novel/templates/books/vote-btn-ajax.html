@@ -1,0 +1,11 @@
+{% if user.is_authenticated %}
+  <button class="btn btn-outline-warning js-vote-btn"
+    data-vote-url="{% url 'books:vote-ajax' book.slug %}">
+    <span>Vote</span>
+    <small>(<span class="js-uvotes">{{request.user.profile.votes}}</span> votes left)</small>
+  </button>
+{% else %}
+  <a class="vote-anon" href="{% url 'account_login' %}?next={{request.path}}">
+    <button class="btn btn-outline-warning">Vote</button>
+  </a>
+{% endif %}

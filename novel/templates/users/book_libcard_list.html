@@ -1,0 +1,61 @@
+{% load static %}
+
+<div class="row js-livesearch-container">
+  {% for book in books %}
+    <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12 js-livesearch-item">
+
+      {% for b_prog in bookprogresses %}
+        {% if b_prog.book_id == book.pk %}
+        {% endif %}
+      {% endfor %}
+      <div class="libcard">
+        <div class="libcard__nav">
+          <button class="btn js-toggle-next">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+          <div class="js-toggle-content" style="display: none;">
+            <button
+              type="submit" class="btn js-lib-btn"
+              data-lib-url="{% url 'users:lib-add-remove-ajax' book.slug %}"
+              data-lib-in=1
+              data-lib-remonly=true>
+              <i class="fas fa-trash-alt"></i>
+              <span>Remove</span>
+            </button>
+          </div>
+        </div>
+      {% if book.pk in prog_book_ids  %}
+        {% for b_prog in bookprogresses %}
+          {% if b_prog.book_id == book.pk %}
+            <a class="libcard__link" href="{% url 'books:bookchapter' book.slug b_prog.c_id %}">
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {% if book.chapters_count %}
+          <a class="libcard__link" href="{% url 'books:bookchapter' book.slug 1 %}">
+        {% else %}
+          <a class="libcard__link" href="{% url 'books:book' book.slug %}">
+        {% endif %}
+      {% endif %}
+          <div class="libcard__poster">
+              <img class="libcard__poster--image" src="{{book.poster.url}}" alt="{{book.title}}">
+          </div>
+          <div class="libcard__info">
+            <div class="libcard__info--title"><h4 class="h4-title">{{book.title|truncatewords:5}}</h4></div>
+            <div class="libcard__info--chaps">
+              {% if book.pk in prog_book_ids  %}
+                {% for b_prog in bookprogresses %}
+                  {% if b_prog.book_id == book.pk %}
+                    Progress {{b_prog.c_id}} / {{book.chapters_count}}
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                Progress 0 / {{book.chapters_count}}
+              {% endif %}
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  {% endfor %}
+</div>

@@ -1,0 +1,21 @@
+{% if user.is_authenticated %}
+  {% if book in user_lib %}
+    <form method="post" action="{% url 'users:library-remove' book.slug %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+      <a href="javascript:void(0)">
+        <button type="submit" class="btn btn-link"><i class="fas fa-check"></i>In Library</button>
+      </a>
+    </form>
+  {% else %}
+    <form method="post" action="{% url 'users:library-add' book.slug %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <a href="javascript:void(0)">
+          <button type="submit" class="btn btn-link">Add to Library</button>
+        </a>
+    </form>
+  {% endif %}
+{% else %}
+  <a href="" class="disabled"><span>Add to Library</span></a>
+{% endif %}

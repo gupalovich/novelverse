@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+{% load books_extras %}
+
+{% block title %}{{book.title}} - {{block.super}}{% endblock %}
+
+{% block content %}
+
+{% include 'components/csrf_gen_form.html' %}
+
+<div class="container">
+
+  <div class="book mt-30">
+
+    <div class="bookhead">
+      <div class="bookhead__poster">
+        <img class="bookhead__poster--image" src="{{book.poster.url}}" alt="{{book.title}}">
+      </div>
+      <div class="bookhead__info">
+        <div class="bookhead__info--title">
+          <h1 class="h1-title-sm">
+            {{book.title}}
+            {% if book.title_sm %}
+              <small>{{book.title_sm}}</small>
+            {% endif %}
+          </h1>
+        </div>
+        <div class="bookhead__info--row">
+          <div class="info-row">
+            <p>Author: {% for author in book.author %}<span>{{author}}</span>{% endfor %}</p>
+            {% if book.country %}
+              <p>Country: {{book.country|title}}</p>
+            {% endif %}
+            <p>Chapters: {{book.chapters_count}}</p>
+            <!-- <p>Views: 0</p> -->
+            <p class="info-row--status">Status:
+              {% if book.status_release == 0 %}
+                {% if book.chapters_release != 0 %}
+                  <span class="c-grn">{{book.chapters_release}} chs / week</span>
+                {% else %}
+                  <span class="c-grn">Ongoing</span>
+                {% endif %}
+              {% else %}
+                <span class="c-rd">Completed</span>
+              {% endif %}
+            </p>
+          </div>
+          <div class="stars-rating-sm">
+            <img src="{% static 'images/star.png' %}" alt="star">
+            <img src="{% static 'images/star.png' %}" alt="star">
+            <img src="{% static 'images/star.png' %}" alt="star">
+            <img src="{% static 'images/star.png' %}" alt="star">
+            <img src="{% static 'images/half-star.png' %}" alt="star">
+            <span>{{book.rating}}</span>
+          </div>
+        </div>
+        <div class="bookhead__info--tags">
+          <a class="booktag" href="{{book.bookgenre.get_absolute_url}}">
+            <span>{{book.bookgenre.name}}</span>
+          </a>
+          {% for booktag in book.booktag.all %}
+            <a class="booktag" href="{{booktag.get_absolute_url}}">
+              <span>{{booktag.name}}</span>
+            </a>
+          {% endfor %}
+        </div>
+        <div class="bookhead__info--read">
+          {% if user_auth %}
+
+            {% if book_prog %}
+              <a href="{% url 'books:bookchapter' book_slug=book.slug c_id=book_prog.c_id %}">
+                <button type="button" class="btn btn-dark">Continue Reading</button>
+              </a>
+            {% else %}
+              {% if book.chapters_count %}
+                <a href="{% url 'books:bookchapter' book_slug=book.slug c_id=1 %}">
+                  <button type="button" class="btn btn-dark">Read</button>
+                </a>
+              {% endif %}
+            {% endif %}
+            {% include 'books/lib-btn-ajax.html' %}
+
+          {% else %}
+
+            {% if book.chapters_count %}
+              <a href="{% url 'books:bookchapter' book_slug=book.slug c_id=1 %}">
+                <button type="button" class="btn btn-dark">Read</button>
+              </a>
+            {% endif %}
+            {% include 'books/lib-btn-ajax.html' %}
+
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="bookbody">
+      <div class="bookbody__tabs">
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">About</a>
+            <a class="nav-item nav-link js-load-chaps" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false"
+            data-chaps-url="{{book.get_absolute_url}}" data-loaded=0>Table of Contents</a>
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+          <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+            <div class="bookbody__tabs--desc">
+              {{book.description|safe}}
+            </div>
+          </div>
+          <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+            <div class="bookbody__tabs--chaps js-chap-container">
+              {% with margin='mt-15 mb-30' %}
+                {% include 'components/loader-dots.html' %}
+              {% endwith %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bookbody__vote">
+        <div class="bookbody__vote--title">
+          <h2 class="h2-title">Ranking</h2>
+        </div>
+        <div class="votecard">
+          <div class="votecard--ranking">
+            <i class="fas fa-poll"></i>
+            {% with ranking=book.ranking|ordinal|sliceintchar %}
+              <span class="js-filter-orginal">{{ranking.0}}</span>
+              <span class="js-filter-orginal">{{ranking.1}}</span>
+            {% endwith %}
+          </div>
+          <div class="votecard--ranking">
+            <i class="fas fa-vote-yea"></i>
+            <span class="js-bvotes">{{book.votes}}</span>
+            <span>votes</span>
+          </div>
+          <div class="votecard--vote">
+            {% include 'books/vote-btn-ajax.html' %}
+          </div>
+        </div>
+      </div>
+
+      {% comment %}
+        <div class="bookbody__review">
+          <div class="bookbody__review--title">
+            <h2 class="h2-title">Reviews</h2>
+          </div>
+        </div>
+      {% endcomment %}
+      {% if similar_books %}
+      <div class="bookbody__similar">
+        <div class="bookbody__similar--title">
+          <h2 class="h2-title">You might also like</h2>
+        </div>
+        <div class="bookbody__similar--slider">
+          <div class="swiper-tape-container swiper-fadein">
+            <div class="swiper-wrapper">
+              {% for book in similar_books %}
+              <div class="swiper-slide bookslide-sm">
+                <div class="bookslide-sm__poster">
+                  <a class="bookslide-sm__poster--link" href="{{book.get_absolute_url}}">
+                    <img class="bookslide-sm__poster--image" src="{{book.poster.url}}" alt="{{book.title}}" loading="lazy">
+                  </a>
+                </div>
+                <div class="bookslide-sm__info">
+                  <h2 class="bookslide-sm__info--title h2-title-sm">
+                    <a href="{{book.get_absolute_url}}">{{book.title}}</a>
+                  </h2>
+                  <div class="bookslide-sm__info--stars stars-rating-sm">
+                    <img src="{% static 'images/star.png' %}" alt="star">
+                    <img src="{% static 'images/star.png' %}" alt="star">
+                    <img src="{% static 'images/star.png' %}" alt="star">
+                    <img src="{% static 'images/star.png' %}" alt="star">
+                    <img src="{% static 'images/half-star.png' %}" alt="star">
+                    <span>{{book.rating}}</span>
+                  </div>
+                  <div class="bookslide-sm__info--desc">
+                    <a href="{{book.get_absolute_url}}">
+                      {{book.description|htmlfree|truncatechars:150|safe}}
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="bookbody__comments">
+        <div class="bookbody__comments--title">
+          <h2 class="h2-title">Discussion</h2>
+        </div>
+        {% with object=book %}
+          {% include 'comments/cm_tree.html' %}
+        {% endwith %}
+      </div>
+
+    </div>
+  </div>
+
+</div> <!-- Container -->
+{% endblock content %}

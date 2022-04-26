@@ -1,0 +1,875 @@
+@import "vars"
+
+/*==========  Desktop First  ==========*/
+
+/* Large Devices, Wide Screens */
+@media only screen and (max-width : 1200px)
+  .mw-swiper
+    width: 91vw
+    .swiper-button-prev
+      left: -1.9rem
+    .swiper-button-next
+      right: -1.9rem
+
+  .bookslide-sm
+    max-width: 460px
+    &__poster
+      &--image
+    &__info
+      &--title
+        font-size: 1.3rem
+
+
+
+  .book
+    .bookhead
+      &__poster
+        &--image
+      &__info
+        &--title
+          .h1-title-sm
+            font-size: 1.6rem
+            margin-bottom: 10px
+        &--row
+          flex-direction: column
+          justify-content: auto
+          align-items: flex-start
+          .info-row
+            margin-bottom: 10px
+            p
+              font-size: .9rem
+              margin-right: 12px
+          .stars-rating-sm
+        &--tags
+        &--read
+
+  .rankcard
+    &__rank
+      padding: 0 15px
+      font-size: 2rem
+    &__poster
+      img
+    &__info
+      .h2-title-sm
+        font-size: 1.10rem
+      .stars-rating-sm
+    &__nav
+      a
+
+  .libcard
+    &__remove
+      a .btn
+        &:hover, &:focus, &:active
+    &__link
+      &:hover, &:active, &:focus
+    &__poster
+      &--image
+        height: 175px
+    &__info
+      &--title
+        .h4-title
+          font-size: .85rem
+      &--chaps
+
+  .searchcard-lg
+    &__info
+      .h2-title-sm
+        font-size: 1.3rem
+
+/* Medium Devices, Desktops */
+@media only screen and (max-width : 991px)
+  .alert-container
+    max-width: 460px
+  .alert
+    margin-bottom: 0
+    bottom: -20px
+  .alert.animate
+    bottom: 0
+
+  .media, .comments__list .media, .comments__tree .media
+    img
+      max-width: 30px
+      height: 30px
+      object-fit: cover
+      margin-right: .5rem!important
+  .media .media-body
+    font-size: .9rem
+  .comments
+    &__count
+      &--title
+      &--filter
+        .btn
+    &__list
+    &__tree
+      .media
+        &::after
+          height: calc(100% - 50px)
+          top: 30px
+          left: 15px
+        .media-body
+          font-size: .9rem
+        .media
+          position: relative
+    &__form
+      margin: 10px 0
+        bottom: 20px
+      font-size: .9rem
+      .form-control
+        font-size: .95rem
+      &--field
+      &--comment
+        .form-control.active
+          min-height: 200px
+        .form-group
+          .btn
+            min-width: 80px
+            font-size: .95rem
+      &--submit
+      &--disabled h5
+        font-size: 1.2rem
+
+
+  .frontpage
+    &__promo
+      min-height: 250px
+      .h1-title
+        font-size: 2rem
+        margin-bottom: .7rem
+      p
+        font-size: 1.1rem
+    &__latest
+
+  // Books list / Book cards
+  .browsebooks
+    &__title
+    &__filters
+    &__books
+      .book-lg-wide
+        grid-template-columns: 1fr
+        &__poster
+          &--image
+            height: auto
+            max-height: 440px
+        &__info
+          &--title
+          &--tags
+          &--stars
+            img
+            span
+          &--desc
+
+  .book
+    .bookhead
+      &__poster
+        &--image
+      &__info
+        &--title
+          .h1-title-sm
+            font-size: 1.4rem
+        &--row
+          .info-row
+            flex-direction: column
+          .stars-rating-sm
+        &--tags
+        &--read
+          .btn
+            font-size: 1rem
+            padding: 8px 25px
+            .fas, .far, .fal
+              font-size: .9rem
+              padding-right: 5px
+    .bookbody
+      &__tabs
+        .tab-content
+        &--desc
+          p
+        &--chaps
+          .chap-latest
+          .chap-volume
+          .chap-nav-card
+            a
+              span
+              small
+      &__vote
+      &__review
+      &__similar
+
+  .js-b-chap.hide
+    position: fixed
+    top: -90px
+    .bookchapter__nav--link
+      .btn
+        margin: 10px 0
+  .js-b-chap.show
+    top: 0
+
+  .bookranking
+    &__cards
+      &__card
+        &:nth-of-type(1)
+          flex: 1 100%
+          max-width: 100%
+        &:nth-of-type(2)
+        &:nth-of-type(3)
+
+  .rankcard
+    width: 100%
+    max-width: 360px
+    margin-left: auto
+    margin-right: auto
+    &__rank
+      padding: 0 18px
+      font-size: 2.2rem
+    &__poster
+      img
+    &__info
+      .h2-title-sm
+        font-size: 1.3rem
+      .stars-rating-sm
+    &__nav
+      a
+
+  .rankcard-wide
+    &__rank
+      font-size: 2.2rem
+      span
+    &__poster
+      img
+    &__info
+      .h2-title-sm
+        font-size: 1.2rem
+      .stars-rating-sm
+      &--nav
+        a
+        > span
+    &__nav
+      &--votes
+        font-size: 1.1rem
+      a, .btn, form
+        width: 155px
+      form .btn
+        width: 100%
+
+
+
+
+  .libcard
+    &__remove
+      a .btn
+        &:hover, &:focus, &:active
+    &__link
+      &:hover, &:active, &:focus
+    &__poster
+      &--image
+        height: 200px
+    &__info
+      &--title
+        .h4-title
+          font-size: .9rem
+      &--chaps
+
+/* Small Devices, Tablets */
+@media only screen and (max-width : 768px)
+  .alert-container
+    max-width: 75%
+
+  .container
+    padding: 0
+
+  .mw-swiper
+    width: 100vw
+    .swiper-pagination.swiper-pagination-bullets
+      bottom: 10px
+    .swiper-button-prev
+      left: 10px
+      display: none
+    .swiper-button-next
+      right: 10px
+      display: none
+
+
+  .footer
+    .col-md-3
+      &:nth-of-type(1)
+        order: 4
+        min-height: auto
+      &:nth-of-type(2)
+        order: 2
+      &:nth-of-type(3)
+        order: 1
+      &:nth-of-type(4)
+        order: 3
+    a
+      &:hover, &:focus, &:active
+    a.active
+    &__col
+      margin-bottom: 30px
+      a
+        &:last-of-type
+          padding-bottom: 0
+      &--title
+        margin-bottom: 10px
+    &__col.brand
+      margin-bottom: 15px
+      .navbar-brand
+        &:hover, &:focus, &:active
+      span
+
+
+  .frontpage
+    &__promo
+      min-height: 200px
+      .h1-title
+        font-size: 1.5rem
+        margin-bottom: .7rem
+      p
+        font-size: .95rem
+      .btn-grp
+        .btn
+    &__latest
+
+  .js-filter-form
+    grid-gap: 0 10px
+    grid-template-columns: repeat(3, 1fr)
+
+  .tag-card
+    width: 140px
+    font-size: .9rem
+
+  .browsebooks
+    &__title
+    &__filters
+    &__books
+      .book-lg-wide
+        max-width: 400px
+        margin: 0 auto
+          bottom: 40px
+        &__poster
+          &--image
+            height: auto
+            max-width: 100%
+            max-height: 530px
+        &__info
+          &--title
+            font-size: 1.2rem
+          &--tags
+          &--stars
+            img
+            span
+          &--desc
+            max-height: 100px
+            overflow: hidden
+
+  .book
+    .bookhead
+      grid-template-columns: 1fr
+      &__poster
+        &--image
+          display: block
+          max-width: 400px
+          height: auto
+          max-height: 530px
+          margin: 0 auto
+      &__info
+        &--title
+          small
+            font-size: .7rem
+        &--row
+          .info-row
+            display: block
+            font-size: .9rem
+            p
+              display: inline-block
+          .stars-rating-sm
+        &--tags
+          margin-bottom: 20px
+        &--read
+          display: grid
+          grid-template-columns: repeat(2, 1fr)
+          grid-gap: 10px
+          a, .btn
+            margin: 0
+            max-width: 100%
+            .btn
+              width: 100%
+          .btn
+            font-size: .95rem
+            padding: 10px 23px
+            .fas, .far, .fal
+              font-size: .85rem
+    .bookbody
+      &__tabs
+        .tab-content
+        &--desc
+          p
+        &--chaps
+          .chap-latest
+            display: inline-grid
+            grid-template-columns: 110px auto
+            small
+              grid-column-start: 2
+          .chap-nav-card
+            flex: 0 1 100%
+      .votecard
+        margin: 40px 0
+        padding: 12px
+        display: flex
+        &--ranking
+          .fas, .far, .fal
+            font-size: 1.5rem
+            margin: 0 10px
+          span
+            &:first-of-type
+              font-size: 1.8rem
+        &--vote
+          form, > a
+            width: 160px
+            .btn
+              span
+                font-size: 1rem
+              small
+                font-size: .7rem
+      &__review
+      &__similar
+
+  .rankcard
+    &__rank
+      padding: 0 16px
+      font-size: 2rem
+    &__poster
+      img
+    &__info
+      .h2-title-sm
+        font-size: 1.15rem
+      .stars-rating-sm
+    &__nav
+      a
+
+  .rankcard-wide
+    flex-direction: column
+    width: 100%
+    max-width: 360px
+    margin-left: auto
+    margin-right: auto
+    position: relative
+    &__rank
+      position: absolute
+      top: 0
+      font-size: 2.1rem
+      span
+        line-height: 1.6
+    &__poster
+      margin: 0 auto
+        bottom: 15px
+      img
+        width: 150px
+        height: 200px
+    &__info
+      text-align: center
+      align-items: center
+      margin-bottom: 20px
+      .h2-title-sm
+        font-size: 1.15rem
+        line-height: 1.2
+        margin-bottom: 15px
+      .stars-rating-sm
+        margin-top: 0
+        margin-bottom: 10px
+      &--nav
+        display: none
+    &__nav
+      margin: 0
+      &--votes
+        font-size: 1.1rem
+      a, form, .js-lib-btn
+        display: block
+      a, .btn, form
+        width: 170px
+      form .btn
+        width: 100%
+      a .btn, form, .js-lib-btn, .js-vote-btn
+        margin-bottom: 10px
+      .js-lib-btn, .lib-anon .btn
+        margin-bottom: 0
+        color: $accent
+        border: none!important
+        box-shadow: none!important
+        background-color: transparent!important
+        &:hover, &:active
+          color: $accent-hot!important
+
+
+  .libcard
+    &__remove
+      a .btn
+        &:hover, &:focus, &:active
+    &__link
+      &:hover, &:active, &:focus
+    &__poster
+      &--image
+        height: 215px
+    &__info
+      &--title
+        .h4-title
+      &--chaps
+
+  .bookchapter
+    &__title .h1-title-sm
+      font-size: 1.7rem
+    &__nav
+      position: relative
+      &--link
+        .btn
+      &--select
+        position: absolute
+        max-width: 100%
+        align-items: center
+        margin: 0
+        .chaps
+          &--toggle
+          &--nav.active
+            margin-top: 15px
+          &--nav
+            width: calc(100% - 12px)
+            min-width: 100%
+            li
+              a
+                &:hover, &:focus, &:active
+            li.active
+              a
+    &__styles
+      .styles
+        max-width: 100%
+    &__title
+      .h1-title-sm
+        margin-bottom: 30px
+    &__body
+      font-size: .9rem
+
+  .booksearch
+    &__title
+    &__form
+      &--form
+        .form-group
+          .form-control
+            font-size: 1rem
+      &--btn
+        .btn
+          padding: 6px 30px
+          border-radius: 0
+    &__formresult
+
+  .searchcard-sm
+    &__counter
+      span
+        font-size: 1.2rem
+    &__poster
+      img
+        margin: 0 12px
+          right: 10px
+    &__info
+      .h2-title-sm
+        font-size: 1.15rem
+
+  .searchcard-lg
+    &__counter
+      span
+    &__poster
+      img
+        width: 60px
+        height: 80px
+    &__info
+      flex-direction: column
+      justify-content: flex-start
+      .h2-title-sm
+      &--stars
+        padding-right: 20px
+
+
+@media only screen and (max-width : 660px)
+  .breadcrumb
+    font-size: .9rem
+
+  .d-lg
+    display: none!important
+  .d-sm
+    display: block!important
+
+  .mw-swiper
+    .swiper-pagination.swiper-pagination-bullets
+      bottom: -5px
+    .swiper-container
+      padding: 30px 20px
+    .swiper-slide.bookslide
+      width: 100%
+      max-width: 370px
+      height: 430px
+      position: relative
+
+  .bookslide
+    display: block
+    position: relative
+    &__hf
+      display: block
+    &__title
+      text-align: center
+      height: 45px
+      overflow: hidden
+      .h2-title-sm
+        font-size: 1.10rem
+        margin-bottom: 5px
+        span
+          padding: 0 10px
+        small
+          top: 0
+          padding-bottom: 5px
+    &__poster
+      width: 180px
+      margin: 0 auto
+        bottom: 10px
+      img
+        width: 100%
+        height: auto
+        max-height: 230px
+    &__info
+      display: block
+      padding: 0 5px
+      height: 120px
+      padding-top: 5px
+      &--desc
+        max-height: 65px
+        overflow: hidden
+        p
+          margin-bottom: 0
+          font-size: 14px
+      &--rate
+    &__nav
+      width: calc(100% - 20px)
+      position: absolute
+      bottom: 10px
+      a
+        .btn
+          font-size: .9rem
+          padding: 6px
+
+/* Extra Small Devices, Phones */
+@media only screen and (max-width : 575px)
+  .container
+    padding: 0 15px
+
+  .bookslide-sm
+    &__poster
+      min-width: 150px
+      &--image
+    &__info
+      &--title
+
+
+  .media, .comments__list .media, .comments__tree .media
+    img
+      max-width: 30px
+      height: 30px
+      object-fit: cover
+      margin-right: .5rem!important
+  .comments
+    &__count
+      &--title
+      &--filter
+        .btn
+    &__list
+    &__tree
+      .media
+        .media
+          left: -15px
+          width: calc(100% + 15px)
+    &__form
+
+
+  .librowse
+    &__title
+      align-items: flex-start
+      flex-direction: column
+      max-width: 240px
+      margin: 0 auto
+      .h1-title
+        font-size: 1.9rem
+        margin-bottom: 15px
+      .form-control
+        max-width: 240px
+        padding: 5px 8px
+        margin-bottom: 30px
+      input
+        font-size: .85rem!important
+  .libcard
+    max-width: 240px
+    margin-left: auto
+    margin-right: auto
+    &__remove
+      a .btn
+        &:hover, &:focus, &:active
+    &__link
+      &:hover, &:active, &:focus
+    &__poster
+      &--image
+        max-width: 100%
+        height: auto
+        max-height: 320px
+    &__info
+      &--title
+        .h4-title-sm
+      &--chaps
+        font-size: .9rem
+
+  .searchcard-lg
+    &__counter
+      display: none
+      span
+        font-size: 1.5rem
+    &__poster
+      margin: 0 10px
+      img
+        width: 60px
+        height: 80px
+    &__info
+      .h2-title-sm
+        font-size: 1rem
+        small
+          font-size: .9rem
+      &--stars
+        margin-bottom: 0
+
+  .book
+    .bookhead
+      &__info
+        &--read
+          a
+          .btn
+            font-size: .8rem
+            padding: 10px 16px
+            .fas, .far, .fal
+              font-size: .75rem
+    .bookbody
+      .votecard
+        max-width: 320px
+        flex-direction: column
+        margin: 40px auto
+        padding: 12px
+        display: flex
+        &--ranking
+          margin-right: 0
+          margin-bottom: 1rem
+          .fas, .far, .fal
+            font-size: 1.5rem
+            margin: 0 10px
+          span
+            &:first-of-type
+              font-size: 1.8rem
+              margin-right: 5px
+        &--vote
+          margin: 0 auto
+          a, .btn
+            width: 260px
+            max-width: 100%
+            > span
+              font-size: 1rem
+            small
+              font-size: .7rem
+
+  .browsebooks
+    &__title
+    &__filters
+    &__books
+      .book-lg-wide
+        max-width: 320px
+        &__poster
+          &--image
+            height: auto
+            max-width: 100%
+            max-height: 430px
+        &__info
+          &--title
+          &--tags
+          &--stars
+            img
+            span
+          &--desc
+            max-height: auto
+            overflow: visible
+
+  .bookchapter
+    &__title .h1-title-sm
+      font-size: 1.4rem
+    &__body
+      p
+    &__nav
+      &--link
+        .btn
+          padding: 4px 22px
+
+
+/* Extra Small Devices, Phones */
+@media only screen and (max-width : 480px)
+  .breadcrumb
+    font-size: .8rem
+
+  .bookslide-sm
+    max-width: 350px
+    &__poster
+      min-width: 50px
+      &--image
+    &__info
+      &--title
+
+  .frontpage
+    &__promo
+      min-height: 190px
+      .h1-title
+        font-size: 1.25rem
+        margin-bottom: .5rem
+      p
+        font-size: .75rem
+    &__latest
+
+  .js-filter-form
+    grid-gap: 0 10px
+    grid-template-columns: repeat(2, 1fr)
+
+  .tag-card
+      width: 120px
+      font-size: .8rem
+  .tag-card.active
+    &::before
+      width: 100%
+
+
+/* Custom, iPhone Retina */
+@media only screen and (max-width : 320px)
+  /**/
+
+
+/*==========  Mobile First  ==========*/
+
+/* Custom, iPhone Retina */
+@media only screen and (min-width : 320px)
+  /**/
+
+
+/* Extra Small Devices, Phones */
+@media only screen and (min-width : 480px)
+  /**/
+
+
+/* Small Devices, Tablets */
+@media only screen and (min-width : 768px)
+  /**/
+
+
+/* Medium Devices, Desktops */
+@media only screen and (min-width : 992px)
+  /**/
+
+
+/* Large Devices, Wide Screens */
+@media only screen and (min-width : 1200px)
+  /**/
+

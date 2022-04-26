@@ -1,0 +1,29 @@
+{% load humanize %}
+
+<div class="chap-latest">
+  <span>Latest release:</span>
+  {% if last_chap %}
+    <a href="{% url 'books:bookchapter' book_slug=book.slug c_id=last_chap.c_id %}">
+      <span>Chapter {{last_chap.c_id}}: {{last_chap.title}}</span>
+    </a>
+    <small>{{last_chap.created|naturaltime}}</small>
+  {% endif %}
+</div>
+{% for bookchapter in bookchapters %}
+  {% with loop_counter=forloop.counter %}
+    {% if book.volumes|length >= 1 %}
+      {% for volume in book.volumes %}
+        {% if loop_counter == volume %}
+          <div class="chap-volume"><span>Volume {{forloop.counter}}</span></div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    <div class="chap-nav-card">
+      <a href="{% url 'books:bookchapter' book_slug=book.slug c_id=bookchapter.c_id %}">
+        <span>{{bookchapter.c_id}}</span>
+        <span>{{bookchapter.title}}</span>
+        <small>{{ bookchapter.created|date:"M d, Y" }}</small>
+      </a>
+    </div>
+  {% endwith %}
+{% endfor %}

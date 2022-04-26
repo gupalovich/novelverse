@@ -1,0 +1,19 @@
+{% if not b_chap.book.volumes %}
+  <span class="chaps--volume">Volume 1</span>
+{% endif %}
+{% for chap in b_chaps %}
+  {% with loop_counter=forloop.counter %}
+    {% if b_chap.book.volumes|length >= 1 %}
+      {% for volume in b_chap.book.volumes %}
+        {% if loop_counter == volume %}
+          <span class="chaps--volume">Volume {{forloop.counter}}</span>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    <li {% if request.path == chap.absolute_url %}class="active" id="activeChap"{% endif %}>
+      <a href="{{chap.absolute_url}}">
+        <span>#{{chap.c_id}}: {{chap.title}}</span>
+      </a>
+    </li>
+  {% endwith %}
+{% endfor %}

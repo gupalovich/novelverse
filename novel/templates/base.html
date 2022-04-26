@@ -1,109 +1,203 @@
 {% load static i18n %}<!DOCTYPE html>
-{% get_current_language as LANGUAGE_CODE %}
-<html lang="{{ LANGUAGE_CODE }}">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>{% block title %}Novel{% endblock title %}</title>
+    <title>{% block title %}Novel To Read{% endblock title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Website for reading webnovels">
-    <meta name="author" content="DmitryPi">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
 
     <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}">
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicons/favicon180x180.ico' %}"> -->
 
     {% block css %}
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/selectize.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/swiper.min.css' %}">
+
     <!-- Your stuff: Third-party CSS libraries go here -->
 
     <!-- This file stores project-specific CSS -->
+
     <link href="{% static 'css/project.min.css' %}" rel="stylesheet">
+
+
     {% endblock %}
-    <!-- Le javascript
-    ================================================== -->
-    {# Placed at the top of the document so pages load faster with defer #}
-    {% block javascript %}
-      <!-- Vendor dependencies bundled as one file-->
-      <script defer src="{% static 'js/vendors.min.js' %}"></script>
-
-      <!-- place project specific Javascript in this file -->
-      <script defer src="{% static 'js/project.min.js' %}"></script>
-
-    {% endblock javascript %}
 
   </head>
 
-  <body>
+  {% with req_cookie=request.COOKIES %}
+  {% if request.resolver_match.url_name == "bookchapter" %}
+    <body class="
+      {{req_cookie.tm_color}}
+      {{req_cookie.tm_font}}
+      {{req_cookie.tm_fz}}
+      {{req_cookie.tm_lh}}
+    ">
+  {% else %}
+    <body>
+  {% endif %}
+  {% endwith %}
 
-    <div class="mb-1">
+    <header class="mb-1">
       <nav class="navbar navbar-expand-md navbar-light bg-light">
-        <div class="container-fluid">
-          <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <div class="container">
+
+          <a class="navbar-brand" href="{% url 'books:front_page' %}">novel2read</a>
+
+          <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <a class="navbar-brand" href="{% url 'home' %}">Novel</a>
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            {% with url_name=request.resolver_match.url_name %}
             <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
-                <a class="nav-link" href="{% url 'home' %}">Home <span class="visually-hidden">(current)</span></a>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle{% if url_name == 'genre-list' or url_name == 'genre' %} active{% endif %}" href="{% url 'books:genre-list' %}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Browse</a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item {% if url_name == 'genre-list' %} active{% endif %}" href="{% url 'books:genre-list' %}">All Genres</a>
+                  <a class="dropdown-item {% if url_name == 'tag-list' %} active{% endif %}" href="{% url 'books:tag-list' %}">All Tags</a>
+                  {% for bookgenre in bookgenres %}
+                    <a class="dropdown-item{% if request.path == bookgenre.get_absolute_url %} active{% endif %}" href="{{bookgenre.get_absolute_url}}">{{bookgenre.name}}</a>
+                  {% endfor %}
+
+                </div>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'about' %}">About</a>
+                <a class="nav-link{% if url_name == 'ranking' %} active{% endif %}" href="{% url 'books:ranking' %}" href="{% url 'books:ranking' %}">Ranking</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link{% if url_name == 'search' %} active{% endif %}" href="{% url 'books:search' %}">Search</a>
+              </li>
+            </ul>
+            <ul class="navbar-nav mr-right">
               {% if request.user.is_authenticated %}
                 <li class="nav-item">
-                  {# URL provided by django-allauth/account/urls.py #}
-                  <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% translate "My Profile" %}</a>
+                  <a class="nav-link" href="{% url 'users:library' request.user.username %}">Library</a>
                 </li>
-                <li class="nav-item">
-                  {# URL provided by django-allauth/account/urls.py #}
-                  <a class="nav-link" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)" role="button" aria-haspopup="true" aria-expanded="false">
+                    {{request.user.username}}
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{% url 'users:detail' request.user.username  %}">
+                      {# URL provided by django-allauth/account/urls.py #}
+                      {% trans "My Profile" %}
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'account_logout' %}">
+                      {# URL provided by django-allauth/account/urls.py #}
+                      {% trans "Sign Out" %}
+                    </a>
+                  </div>
                 </li>
               {% else %}
-                {% if ACCOUNT_ALLOW_REGISTRATION %}
-              <li class="nav-item">
-                {# URL provided by django-allauth/account/urls.py #}
-                <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
-              </li>
-              {% endif %}
                 <li class="nav-item">
                   {# URL provided by django-allauth/account/urls.py #}
-                  <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+                  <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
+                </li>
+                <li class="nav-item">
+                  {# URL provided by django-allauth/account/urls.py #}
+                  <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
                 </li>
               {% endif %}
             </ul>
+            {% endwith %}
           </div>
         </div>
       </nav>
+    </header>
 
-    </div>
-
-    <div class="container">
+    <div class="container alert-container">
 
       {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
+          {% for message in messages %}
+              <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+          {% endfor %}
       {% endif %}
 
+    </div> <!-- container -->
+
+    <main>
+      {% load django_bootstrap_breadcrumbs %}
+
+      {% block breadcrumbs %}
+          {% clear_breadcrumbs %}
+          {% breadcrumb "Home" "books:front_page" %}
+      {% endblock %}
+
       {% block content %}
-        <p>Use this document as a way to quick start any new project.</p>
+        {% render_breadcrumbs %}
+        <p>Default new page.</p>
       {% endblock content %}
 
-    </div> <!-- /container -->
+      {% block modal %}{% endblock modal %}
+    </main>
 
-    {% block modal %}{% endblock modal %}
 
-    {% block inline_javascript %}
-    {% comment %}
-    Script tags with only code, no src (defer by default). To run
-    with a "defer" so that you run inline code:
-    <script>
-      window.addEventListener('DOMContentLoaded', () => {/* Run whatever you want */});
-    </script>
-    {% endcomment %}
-    {% endblock inline_javascript %}
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="footer__col brand">
+              <a class="navbar-brand" href="{% url 'books:front_page' %}">
+                novel2read
+              </a>
+              <span>© {% now "Y" %} novel2read</span>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="footer__col">
+              <h4 class="footer__col--title h4-title">Contacts</h4>
+              {% url 'contact-us' as contact_us_url %}
+              <a class="{% if request.path == contact_us_url %}active{% endif %}" href="{{contact_us_url}}">Contact Us</a>
+              {% url 'advertisement' as advertisement_url %}
+              <a class="{% if request.path == advertisement_url %}active{% endif %}" href="{{advertisement_url}}">Advertisement</a>
+              {% url 'report-problem' as report_problem_url %}
+              <a class="{% if request.path == report_problem_url %}active{% endif %}" href="{{report_problem_url}}">Report Problem</a>
+              {% url 'send-feedback' as send_feedback_url %}
+              <a class="{% if request.path == send_feedback_url %}active{% endif %}" href="{{send_feedback_url}}">Send Feedback</a>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="footer__col">
+              <h4 class="footer__col--title h4-title">Genres</h4>
+                {% for bookgenre in bookgenres %}
+                  <a class="{% if request.path == bookgenre.get_absolute_url %}active{% endif %}" href="{{bookgenre.get_absolute_url}}">{{bookgenre.name}}</a>
+                {% endfor %}
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="footer__col">
+              <h4 class="footer__col--title h4-title">Pages</h4>
+              {% comment %}
+              <a class="{% if request.path == '' %}active{% endif %}" href="">Premium</a>
+              <a class="{% if request.path == '' %}active{% endif %}" href="">Daily Missions</a>
+              <a class="{% if request.path == '' %}active{% endif %}" href="">Referral</a>
+              {% endcomment %}
+              {% url 'privacy-policy' as privacy_url %}
+              <a class="{% if request.path == privacy_url %}active{% endif %}" href="{{privacy_url}}">Privacy Policy</a>
+              {% url 'terms-conditions' as terms_url %}
+              <a class="{% if request.path == terms_url %}active{% endif %}" href="{{terms_url}}">Terms and Conditions</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    {% block javascript %}
+      <script type="text/javascript" src="{% static 'js/libs.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/project.min.js' %}"></script>
+    {% endblock javascript %}
+
   </body>
 </html>
+

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+
+{% block title %}Home - {{block.super}}{% endblock %}
+
+{% block content %}
+  <div class="frontpage__promo mt-30">
+    <div class="container text-center">
+      <h1 class="h1-title">{{promo_title}}</h1>
+      <p>{{promo_subtitle}}</p>
+      {% if not user.is_authenticated %}
+        <div class="btn-grp">
+          <a href="{% url 'account_login' %}" class="btn btn-light">
+            <span>Sign In</span>
+          </a>
+          <a href="{% url 'account_signup' %}" class="btn btn-light">
+            <span>Sign Up</span>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="container-fluid mw-swiper">
+    <div class="row">
+
+      <div class="swiper-container swiper-fadein">
+        <div class="swiper-wrapper">
+
+        {% for book in books %}
+          <div class="swiper-slide bookslide">
+            <div class="bookslide__hf">
+              <div class="bookslide__poster">
+                <img src="{{book.poster.url}}" alt="{{book.title}}" loading="lazy">
+              </div>
+            </div>
+            <div class="bookslide__hf">
+              <div class="bookslide__title">
+                <h2 class="h2-title-sm">
+                  <span>{{book.title}}</span>
+                  <small>
+                    <a href="{{book.bookgenre.get_absolute_url}}">
+                      {{book.bookgenre}}
+                    </a>
+                  </small>
+                </h2>
+              </div>
+              <div class="bookslide__info">
+                <div class="bookslide__info--desc">
+                  {{book.description|truncatechars_html:300|safe}}
+                </div>
+                <!--
+                  <div class="bookslide__info--rate">
+                    <span>{{book.rating}} votes {{book.votes}}</span>
+                  </div>
+                -->
+              </div>
+              <div class="bookslide__nav">
+                {% if book.chapters_count %}
+                  <a href="{% url 'books:bookchapter' book_slug=book.slug c_id=1 %}">
+                    <button type="button" class="btn btn-light">Read</button>
+                  </a>
+                {% endif %}
+                <a href="{{book.get_absolute_url}}">
+                  <button type="button" class="btn btn-light">More</button>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+        </div> <!-- Slide wrapper -->
+
+        <!-- Add Pagination -->
+        <!-- <div class="swiper-pagination"></div> -->
+
+
+      </div> <!-- Slider container -->
+
+      <div class="swiper-button-prev text-right">
+        <i class="fal fa-chevron-left"></i>
+      </div>
+      <div class="swiper-button-next">
+        <i class="fal fa-chevron-right"></i>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="container mt-30">
+    <div class="frontpage__latest">
+      <div class="frontpage__latest--title">
+        <h2 class="h2-title">Latest updates:</h2>
+      </div>
+      <div class="row mt-30 infinite-container">
+      {% for b_chap in b_chaps %}
+        <div class="col-md-6 col-sm-12 infinite-item">
+          <a href="{{b_chap.get_absolute_url}}" class="b-chap-card-sm">
+            <div class="b-chap-card-sm__poster">
+              <img src="{{b_chap.book.poster.url}}" alt="{{b_chap.book.title}}" loading="lazy">
+            </div>
+            <div class="b-chap-card-sm__info">
+              <h3 class="h3-title-sm">{{b_chap.book.title}}</h3>
+              <h4 class="h4-title-sm">
+                <span>Chapter {{b_chap.c_id}}: {{b_chap.title}}</span>
+                <small>{{b_chap.created|naturaltime}}</small>
+              </h4>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+      </div>
+
+      {% if b_chaps.has_next %}
+        <a class="infinite-more-link mb-30"
+           href="?page={{ b_chaps.next_page_number }}">
+           <button class="btn btn-dark">More</button>
+        </a>
+      {% endif %}
+
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block javascript %}
+  {{ block.super }}
+{% endblock %}

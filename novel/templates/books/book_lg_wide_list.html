@@ -1,0 +1,44 @@
+{% load static %}
+{% load books_extras %}
+
+<div class="row">
+  {% for book in books %}
+  <div class="col-md-6 col-sm-6 col-xs-12">
+    <div class="book-lg-wide">
+      <div class="book-lg-wide__poster">
+        <a class="book-lg-wide__poster--link" href="{{book.get_absolute_url}}">
+          <img class="book-lg-wide__poster--image" src="{{book.poster.url}}" alt="{{book.title}}" loading="lazy">
+        </a>
+      </div>
+      <div class="book-lg-wide__info">
+        <h2 class="book-lg-wide__info--title h2-title-sm">
+          <a href="{{book.get_absolute_url}}">{{book.title}}</a>
+        </h2>
+        <div class="book-lg-wide__info--tags">
+          <a class="booktag" href="{{book.bookgenre.get_absolute_url}}">
+            <span>{{book.bookgenre.name}}</span>
+          </a>
+          {% for booktag in book.booktag.all|slice:":5" %}
+            <a class="booktag" href="{{booktag.get_absolute_url}}">
+              <span>{{booktag.name}}</span>
+            </a>
+          {% endfor %}
+        </div>
+        <div class="book-lg-wide__info--stars stars-rating-sm">
+          <img src="{% static 'images/star.png' %}" alt="star">
+          <img src="{% static 'images/star.png' %}" alt="star">
+          <img src="{% static 'images/star.png' %}" alt="star">
+          <img src="{% static 'images/star.png' %}" alt="star">
+          <img src="{% static 'images/half-star.png' %}" alt="star">
+          <span>{{book.rating}}</span>
+        </div>
+        <div class="book-lg-wide__info--desc">
+          <a href="{{book.get_absolute_url}}">
+            {{book.description|htmlfree|truncatechars:150|safe}}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>

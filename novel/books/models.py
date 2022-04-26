@@ -117,7 +117,10 @@ class Book(TimeStampedModel):
     status = models.IntegerField(choices=STATUS, default=STATUS.draft, db_index=True)
     STATUS_RELEASE = Choices(
         (0, 'ongoing', _('ongoing')),
-        (1, 'completed', _('completed')), )
+        (1, 'onhold', _('onhold')),
+        (2, 'abandoned', _('abandoned')),
+        (3, 'completed', _('completed')),
+    )
     status_release = models.IntegerField(choices=STATUS_RELEASE, default=STATUS_RELEASE.ongoing)
     published_at = MonitorField(monitor='status', when=['published'])
     tracker = FieldTracker()
@@ -179,15 +182,3 @@ class BookChapter(TimeStampedModel):
             self.slug = get_unique_slug(BookChapter, self.title)
         self.title = capitalize_str(self.title)
         return super().save(*args, **kwargs)
-
-
-class BookChapterReplace(TimeStampedModel):
-    replace = models.CharField(_('Replace'), blank=False, default='', max_length=355)
-    replace_to = models.CharField(_('Replace to'), blank=True, default='', max_length=355)
-
-    class Meta:
-        verbose_name = _('Book Chapter Replace')
-        verbose_name_plural = _('Book Chapter Replaces')
-
-    def __str__(self):
-        return self.replace

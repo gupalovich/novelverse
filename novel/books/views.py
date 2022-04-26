@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from django.views.decorators.vary import vary_on_headers
 from django.views.generic import View, DetailView, ListView
 
-from novel2read.apps.users.models import BookProgress
+from novel.users.models import BookProgress
 from .models import Book, BookTag, BookChapter
 from .forms import BookSearchForm
 from .filters import BookFilter

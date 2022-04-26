@@ -1,7 +1,7 @@
 from django.db.models import Count
 from django.contrib import admin
 from django_summernote.admin import SummernoteModelAdminMixin
-from .models import BookGenre, BookTag, Book, BookChapter, BookChapterReplace
+from .models import BookGenre, BookTag, Book, BookChapter
 
 
 @admin.register(BookGenre)
@@ -169,22 +169,3 @@ class BookChapterAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
     def get_book_revisit_id(self, obj):
         return obj.book.revisit_id
     get_book_revisit_id.short_description = 'Book revisit_id'
-
-
-@admin.register(BookChapterReplace)
-class BookChapterReplaceAdmin(admin.ModelAdmin):
-    search_fields = ('replace', 'replace_to')
-    fieldsets = (
-        (None, {
-            'fields': (
-                'id',
-                'replace',
-                'replace_to',
-            ),
-        }),
-        (None, {
-            'fields': ('created', 'modified'),
-        }),
-    )
-    readonly_fields = ('id', 'created', 'modified')
-    list_display = ('replace', 'replace_to', 'created', 'modified', )

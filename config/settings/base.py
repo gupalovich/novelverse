@@ -75,6 +75,7 @@ THIRD_PARTY_APPS = [
     'django_comments_xtd',
     'django_comments',
     "crispy_forms",
+    "crispy_bootstrap5",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -308,3 +309,7 @@ SOCIALACCOUNT_FORMS = {"signup": "novel.users.forms.UserSocialSignupForm"}
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+WEBMASTER_VERIFICATION = {
+    'google': env('GOOGLE_SEARCH_CODE'),
+    'yandex': env('YANDEX_SEARCH_CODE'),
+}

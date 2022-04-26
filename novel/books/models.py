@@ -10,6 +10,14 @@ from model_utils.models import TimeStampedModel
 from .managers import BookManager
 from .utils import get_unique_slug, capitalize_str
 
+VISIT_CHOICES = Choices(
+    ('webnovel', 'Webnovel'),
+    ('boxnovel', 'Boxnovel'),
+    ('pandanovel', 'Pandanovel'),
+    ('wuxiaworld', 'Wuxia World'),
+    ('lnmtl', 'LNMTL'),
+    ('other', 'Other'), )
+
 
 class BookGenre(TimeStampedModel):
     name = models.CharField(_('Genre'), blank=False, default='', max_length=112)
@@ -93,15 +101,6 @@ class Book(TimeStampedModel):
     ranking = models.PositiveIntegerField(_('Ranking'), blank=True, null=True, default=0)
     rating = models.FloatField(_('Rating'), blank=True, default=0.0)
     recommended = models.BooleanField(blank=True, default=False)
-    VISIT_CHOICES = Choices(
-        ('webnovel', 'Webnovel'),
-        ('boxnovel', 'Boxnovel'),
-        ('wuxiaworld', 'Wuxia World'),
-        ('gravitytails', 'Gravity Tails'),
-        ('flyinglines', 'Flying Lines'),
-        ('lnmtl', 'LNMTL'),
-        ('other', 'Other'),
-    )
     visit = models.CharField(
         choices=VISIT_CHOICES, blank=True, default=VISIT_CHOICES.webnovel, max_length=55)
     visit_id = models.CharField(_('Visit id'), blank=True, default='', max_length=255)
@@ -154,6 +153,7 @@ class Book(TimeStampedModel):
 
 
 class BookChapter(TimeStampedModel):
+    """TODO: 'reports' field/model"""
     book = models.ForeignKey(
         Book,
         on_delete=models.CASCADE,
@@ -165,6 +165,7 @@ class BookChapter(TimeStampedModel):
     title = models.CharField(_('Title'), blank=False, default='', max_length=255)
     slug = models.SlugField(default='', max_length=255, unique=True)
     text = models.TextField(blank=False, default='')
+    origin = models.CharField(choices=VISIT_CHOICES, blank=True, default='', max_length=55)
 
     class Meta:
         verbose_name = _('Book Chapter')

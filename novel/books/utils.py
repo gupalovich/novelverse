@@ -1,5 +1,4 @@
 import os
-import gc
 import re
 import requests
 import logging

@@ -91,7 +91,7 @@ def spoon_feed(qs, func, chunk=1000, start=0):
 def search_multiple_replace():
     from .models import BookChapter, BookChapterReplace
     b_chaps = BookChapter.objects.order_by('pk')
-    to_repls = BookChapterReplace.objects.order_by('pk')
+    # to_repls = BookChapterReplace.objects.order_by('pk')
     result = []
     for b_chap in b_chaps.iterator(chunk_size=1000):
         if '<br>' in b_chap.text:

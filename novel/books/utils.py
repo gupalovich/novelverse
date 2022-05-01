@@ -89,7 +89,7 @@ def spoon_feed(qs, func, chunk=1000, start=0):
 
 
 def search_multiple_replace():
-    from .models import BookChapter, BookChapterReplace
+    from .models import BookChapter
     b_chaps = BookChapter.objects.order_by('pk')
     # to_repls = BookChapterReplace.objects.order_by('pk')
     result = []

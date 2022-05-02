@@ -69,7 +69,7 @@ def capitalize_str(string):
 
 
 def capitalize_slug(slug):
-    slug = re.sub('\d', '', ' '.join([w.capitalize() for w in slug.split('-')])).strip()
+    slug = re.sub(r'\d', '', ' '.join([w.capitalize() for w in slug.split('-')])).strip()
     return slug
 
 

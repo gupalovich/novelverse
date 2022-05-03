@@ -1,12 +1,15 @@
 import logging
+import time
 import re
 
 from django.utils.text import slugify
 from datetime import datetime
 from requests_html import HTMLSession
 from selenium import webdriver
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 from fake_useragent import UserAgent
 
 # from .models import Book, BookChapter, BookTag  # comment to execute '__main__'
@@ -21,7 +24,7 @@ class BookScraper:
             'gravitytales': 'https://www.gravitytales.net/',
         }
         self.driver_opts = webdriver.ChromeOptions()
-        self.driver_opts.add_argument('headless')
+        # self.driver_opts.add_argument('headless')
         self.driver_opts.add_argument('disable-gpu')
         self.driver_opts.add_argument('log-level=3')
         self.driver_opts.add_argument('lang=en-US')
@@ -31,6 +34,12 @@ class BookScraper:
         user_agent = UserAgent()
         user_agent = user_agent.random
         self.driver_opts.add_argument(f'user-agent={user_agent}')
+
+    def sel_find_css(self, driver, selector, many=False):
+        if many:
+            return driver.find_elements(by=By.CSS_SELECTOR, value=selector)
+        else:
+            return driver.find_element(by=By.CSS_SELECTOR, value=selector)
 
     def webnovel_get_book_data(self, book_url: str) -> list:
         """GET webnovel book data with html_requests"""
@@ -96,13 +105,51 @@ class BookScraper:
         driver.close()
         return c_ids
 
+    def webnovel_get_chap(self, chap_url: str) -> dict:
+        """GET webnovel book chapter data and comments with selenium
+        TODO: fix volume 0 chapters"""
+        print(chap_url)
+        driver = webdriver.Chrome(options=self.driver_opts)
+        wait = WebDriverWait(driver, 5)
+        driver.get(chap_url)
+        chap_data = {}
+        try:
+            self.sel_find_css(driver, '.cha-content._lock')
+        except NoSuchElementException:
+            chap_title_raw = self.sel_find_css(driver, '.cha-tit h1').text
+            chap_title = re.split(
+                r':|-|–', chap_title_raw, maxsplit=1)[1].strip().replace('‽', '?!')
+            chap_id = int(re.findall(r'\d+', chap_title_raw)[0])
+            chap_content_raw = self.sel_find_css(driver, '.cha-paragraph p', many=True)
+            chap_content = ''.join([f'<p>{p.text}</p>' for p in chap_content_raw if p.text])
+            chap_thoughts_raw = self.sel_find_css(driver, '.m-thou p', many=True)
+            chap_thoughts = ''.join([f'<p>{p.text}</p>' for p in chap_thoughts_raw if p.text])
+            self.sel_find_css(driver, 'a.j_comments').click()
+            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.m-comment-bd')))
+            chap_comments_raw = self.sel_find_css(driver, '.m-comment-bd', many=True)
+            chap_commments = []
+            for comment in chap_comments_raw:
+                comment = comment.text
+                comment.replace('[img=update]', '')
+                if len(comment) > 3:
+                    chap_commments.append(comment.capitalize())
+            print(chap_commments)
+            chap_data.update({
+                'c_id': chap_id,
+                'c_title': chap_title,
+                'c_content': chap_content,
+                'c_thoughts': chap_thoughts,
+                'c_comments': chap_commments,
+            })
+        driver.close()
+        return chap_data
+
     def run(self):
         from pprint import pprint
         book_ids = ['20134751006091605', '14187175405584205', '19100202406400905']
-        for b_id in book_ids:
-            book_url = self.urls['webnovel'] + b_id
-            pprint(len(self.webnovel_get_chap_ids(book_url)))
-            print('')
+        chap_ids = ['54048846463951458', '54201840178355633', '54827256119359229']
+        b_chap_url = f'{self.urls["webnovel"]}{book_ids[0]}/{chap_ids[0]}'
+        pprint(self.webnovel_get_chap(b_chap_url))
 
 
 if __name__ == '__main__':

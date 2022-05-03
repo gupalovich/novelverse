@@ -1,13 +1,11 @@
 import logging
 import re
 
-from django.conf import settings
 from django.utils.text import slugify
 from datetime import datetime
 from requests_html import HTMLSession
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.remote.remote_connection import LOGGER
 
 from .models import Book, BookChapter, BookTag
 from .utils import download_img, upload_to_s3, multiple_replace
@@ -18,7 +16,17 @@ from .utils import download_img, upload_to_s3, multiple_replace
 
 
 class BookScraper:
-    pass
+    def __init__(self):
+        self.urls = {
+            'webnovel': 'https://www.webnovel.com/book/',
+            'boxnovel': 'https://boxnovel.com/novel/',
+        }
+        self.driver_opts = webdriver.ChromeOptions()
+        # self.driver_opts.add_argument('headless')
+        self.driver_opts.add_argument('disable-gpu')
+        self.driver_opts.add_argument('log-level=3')
+        self.driver_opts.add_argument('lang=en-US')
+        self.driver_opts.add_argument('silent')
 
 
 class BookScraper2:

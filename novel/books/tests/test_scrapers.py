@@ -8,6 +8,11 @@ from ..scrapers import BookScraper
 
 
 class BookScraperTest(TestCase):
+    def setUp(self):
+        pass
+
+
+class BookScraperTest2(TestCase):
     @factory.django.mute_signals(signals.post_save)
     def setUp(self):
         self.client = Client()

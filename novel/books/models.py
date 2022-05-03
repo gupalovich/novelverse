@@ -66,7 +66,6 @@ class BookTag(TimeStampedModel):
 
 
 class Book(TimeStampedModel):
-    """TODO: view_count"""
     objects = BookManager()
     title = models.CharField(_('Title'), blank=False, default='', max_length=255)
     title_sm = models.CharField(_('Title short'), blank=True, default='', max_length=50)
@@ -91,6 +90,7 @@ class Book(TimeStampedModel):
     similar = ArrayField(models.IntegerField(), blank=True, default=list)
     description = models.TextField(_('Description'), blank=True, default='')
     volumes = ArrayField(models.SmallIntegerField(default=1), blank=True, default=list)
+    view_count = models.PositiveIntegerField(_('View Count'), blank=True, null=True, default=0)
     chapters_count = models.PositiveIntegerField(_('Chapters'), blank=True, null=True, default=0)
     chapters_release = models.SmallIntegerField(_('Chapters update'), blank=True, null=True, default=0)
     poster = models.ImageField(

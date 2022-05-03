@@ -18,6 +18,10 @@ from .utils import download_img, upload_to_s3, multiple_replace
 
 
 class BookScraper:
+    pass
+
+
+class BookScraper2:
     def __init__(self):
         logging.info(f'Creating instance: {self.__class__.__name__}')
         self.url_bb = {

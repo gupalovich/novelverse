@@ -21,8 +21,8 @@ class BookScraper:
             'gravitytales': 'https://www.gravitytales.net/',
         }
         self.driver_opts = webdriver.ChromeOptions()
-        # self.driver_opts.add_argument('headless')
-        # self.driver_opts.add_argument('disable-gpu')
+        self.driver_opts.add_argument('headless')
+        self.driver_opts.add_argument('disable-gpu')
         self.driver_opts.add_argument('log-level=3')
         self.driver_opts.add_argument('lang=en-US')
         self.driver_opts.add_argument('silent')
@@ -62,8 +62,8 @@ class BookScraper:
 
     def webnovel_get_book_volumes(self, book_url: str) -> list:
         """GET webnovel book volumes with selenium"""
-        self.setup_user_agent()
-        driver = webdriver.Chrome(chrome_options=self.driver_opts)
+        # self.setup_user_agent()
+        driver = webdriver.Chrome(options=self.driver_opts)
         wait = WebDriverWait(driver, 5)
         driver.get(book_url)
         driver.find_element(by=By.CSS_SELECTOR, value='a.j_show_contents').click()
@@ -79,12 +79,29 @@ class BookScraper:
         driver.close()
         return book_volumes
 
+    def webnovel_get_chap_ids(self, book_url: str, s_from=0, s_to=0) -> list:
+        """GET webnovel book chapter ids with selenium"""
+        # self.setup_user_agent()
+        driver = webdriver.Chrome(options=self.driver_opts)
+        wait = WebDriverWait(driver, 5)
+        driver.get(book_url)
+        driver.find_element(by=By.CSS_SELECTOR, value='a.j_show_contents').click()
+        if s_to:
+            c_list = wait.until(
+                lambda driver: driver.find_elements(by=By.CSS_SELECTOR, value='.content-list li')[s_from:s_to])
+        else:
+            c_list = wait.until(lambda driver: driver.find_elements(
+                by=By.CSS_SELECTOR, value='.content-list li'))
+        c_ids = [li.get_attribute("data-cid") for li in c_list]
+        driver.close()
+        return c_ids
+
     def run(self):
         from pprint import pprint
         book_ids = ['20134751006091605', '14187175405584205', '19100202406400905']
         for b_id in book_ids:
             book_url = self.urls['webnovel'] + b_id
-            pprint(self.webnovel_get_book_data(book_url))
+            pprint(len(self.webnovel_get_chap_ids(book_url)))
             print('')
 
 

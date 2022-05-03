@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import re
 
@@ -6,13 +7,11 @@ from datetime import datetime
 from requests_html import HTMLSession
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from fake_useragent import UserAgent
 
-from .models import Book, BookChapter, BookTag
-from .utils import download_img, upload_to_s3, multiple_replace
-
-# Logging restrictions
-# LOGGER.setLevel(logging.WARNING)
-# logging.getLogger("urllib3").setLevel(logging.WARNING)
+# from .models import Book, BookChapter, BookTag  # comment to execute '__main__'
+# from .utils import *  # comment to execute '__main__'
 
 
 class BookScraper:
@@ -24,10 +23,49 @@ class BookScraper:
         }
         self.driver_opts = webdriver.ChromeOptions()
         # self.driver_opts.add_argument('headless')
-        self.driver_opts.add_argument('disable-gpu')
+        # self.driver_opts.add_argument('disable-gpu')
         self.driver_opts.add_argument('log-level=3')
         self.driver_opts.add_argument('lang=en-US')
         self.driver_opts.add_argument('silent')
+
+    def setup_user_agent(self) -> None:
+        user_agent = UserAgent()
+        user_agent = user_agent.random
+        self.driver_opts.add_argument(f'user-agent={user_agent}')
+
+    def get_book_volumes_webnovel(self, book_id: str) -> list:
+        """GET webnovel book volumes with selenium"""
+        book_url = self.urls['webnovel'] + book_id
+        driver = webdriver.Chrome(chrome_options=self.driver_opts)
+        wait = WebDriverWait(driver, 5)
+        driver.get(book_url)
+        driver.find_element(by=By.CSS_SELECTOR, value='a.j_show_contents').click()
+        volumes = wait.until(
+            lambda driver: driver.find_elements(by=By.CSS_SELECTOR, value='.volume-item'))
+        book_volumes = [1, ]
+        for volume in volumes:
+            chap_len = len(driver.find_elements(by=By.CSS_SELECTOR, value='.volume-item ol li'))
+            volume_len = len(volume.find_elements(by=By.CSS_SELECTOR, value='ol li'))
+            volume_len += book_volumes[-1]
+            if volume_len - 1 != chap_len:
+                book_volumes.append(volume_len)
+        driver.close()
+        return book_volumes
+
+    def run(self):
+        book_id_wn = '20134751006091605'
+        print(self.get_book_volumes_webnovel(book_id_wn))
+
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.WARNING, format='%(name)-24s: %(levelname)-8s %(message)s')
+    start = datetime.now()
+
+    scraper = BookScraper()
+    scraper.run()
+
+    finish = datetime.now() - start
+    logging.info(f'Done in: {finish}')
 
 
 class BookScraper2:
@@ -572,18 +610,3 @@ class BookScraper2:
             'locked_ended_from_url': b_chap_url,
         }
         return b_chap_info
-
-
-def main():
-    logging.basicConfig(level=logging.DEBUG, format='%(name)-24s: %(levelname)-8s %(message)s')
-    start = datetime.now()
-
-    scraper = BookScraper()
-    scraper.run()
-
-    finish = datetime.now() - start
-    logging.info(f'Done in: {finish}')
-
-
-if __name__ == '__main__':
-    main()

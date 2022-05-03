@@ -2,7 +2,7 @@ import json
 import traceback
 from celery import states
 from celery.exceptions import Ignore
-from novel2read.taskapp.celery import app, save_celery_result
+from novel.taskapp.celery import app, save_celery_result
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 from .models import Book, BookChapter
@@ -220,7 +220,7 @@ def book_scraper_chaps_update(self, s_from=0, s_to=0):
                     one_off=True,
                     interval=schedule,
                     name=f'Update book chapters: {book.title}',
-                    task='novel2read.apps.books.tasks.book_revisit_novel',
+                    task='novel.books.tasks.book_revisit_novel',
                     args=json.dumps([book.pk]),
                     kwargs=json.dumps({
                         's_from': s_from,

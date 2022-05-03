@@ -1,6 +1,7 @@
 import factory
 from django.test import Client, TestCase, tag
 from django.db.models import signals
+from unittest import skip
 
 from ..models import Book, BookGenre, BookTag
 from ..utils import capitalize_str
@@ -12,6 +13,7 @@ class BookScraperTest(TestCase):
         pass
 
 
+@skip('Ignore')
 class BookScraperTest2(TestCase):
     @factory.django.mute_signals(signals.post_save)
     def setUp(self):

@@ -23,7 +23,7 @@ def book_scraper_initial_signal(sender, instance, created=False, **kwargs):
             one_off=True,
             interval=schedule,
             name=f'Update book: {instance.title}',
-            task='novel2read.apps.books.tasks.book_scraper_info',
+            task='novel.books.tasks.book_scraper_info',
             args=json.dumps([instance.pk]),
         )
 
@@ -36,7 +36,7 @@ def book_scraper_initial_signal(sender, instance, created=False, **kwargs):
                 one_off=True,
                 interval=schedule,
                 name=f'Update book chapters init: {instance.title}',
-                task='novel2read.apps.books.tasks.book_scraper_chaps',
+                task='novel.books.tasks.book_scraper_chaps',
                 args=json.dumps([instance.pk]),
             )
 

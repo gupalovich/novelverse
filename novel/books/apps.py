@@ -7,6 +7,6 @@ class BooksConfig(AppConfig):
 
     def ready(self):
         try:
-            import novel2read.apps.books.signals  # noqa F401
+            import novel.books.signals  # noqa F401
         except ImportError:
             pass

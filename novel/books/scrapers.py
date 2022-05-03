@@ -20,6 +20,7 @@ class BookScraper:
         self.urls = {
             'webnovel': 'https://www.webnovel.com/book/',
             'boxnovel': 'https://boxnovel.com/novel/',
+            'gravitytales': 'https://www.gravitytales.net/',
         }
         self.driver_opts = webdriver.ChromeOptions()
         # self.driver_opts.add_argument('headless')

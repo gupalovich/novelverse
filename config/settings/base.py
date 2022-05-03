@@ -267,6 +267,7 @@ LOGGING = {
 
 # Celery
 # ------------------------------------------------------------------------------
+INSTALLED_APPS += ["novel.taskapp.celery.CeleryAppConfig"]
 if USE_TZ:
     # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-timezone
     CELERY_TIMEZONE = TIME_ZONE

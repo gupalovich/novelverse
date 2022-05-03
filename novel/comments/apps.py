@@ -7,6 +7,6 @@ class CommentsConfig(AppConfig):
 
     def ready(self):
         try:
-            import novel2read.apps.comments.signals  # noqa F401
+            import novel.comments.signals  # noqa F401
         except ImportError:
             pass

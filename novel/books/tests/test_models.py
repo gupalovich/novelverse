@@ -2,10 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from ..models import BookGenre, BookTag, Book, BookChapter
-
-
-def capitalize(str):
-    return ' '.join([w.capitalize() for w in str.split(' ')])
+from ..utils import capitalize_str
 
 
 class BookGenreModelTest(TestCase):
@@ -14,9 +11,9 @@ class BookGenreModelTest(TestCase):
         self.bookgenre_1 = BookGenre.objects.create(name='test genre')
 
     def test_bookgenre_data(self):
-        self.assertEqual(self.bookgenre.name, capitalize('test genre'))
+        self.assertEqual(self.bookgenre.name, capitalize_str('test genre'))
         self.assertEqual(self.bookgenre.slug, 'test-genre')
-        self.assertEqual(self.bookgenre_1.name, capitalize('test genre'))
+        self.assertEqual(self.bookgenre_1.name, capitalize_str('test genre'))
         self.assertEqual(self.bookgenre_1.slug, 'test-genre-1')
 
     def test_bookgenre_data_invalid(self):
@@ -68,9 +65,9 @@ class BookTagModelTest(TestCase):
         self.booktag_1 = BookTag.objects.create(name='test tag')
 
     def test_booktag_data(self):
-        self.assertEqual(self.booktag.name, capitalize('test tag'))
+        self.assertEqual(self.booktag.name, capitalize_str('test tag'))
         self.assertEqual(self.booktag.slug, 'test-tag')
-        self.assertEqual(self.booktag_1.name, capitalize('test tag'))
+        self.assertEqual(self.booktag_1.name, capitalize_str('test tag'))
         self.assertEqual(self.booktag_1.slug, 'test-tag-1')
 
     def test_booktag_data_invalid(self):
@@ -125,9 +122,9 @@ class BookModelTest(TestCase):
         self.book_1.booktag.add(self.booktag)
 
     def test_book_data(self):
-        self.assertEqual(self.book.title, capitalize('test book'))
+        self.assertEqual(self.book.title, capitalize_str('test book'))
         self.assertEqual(self.book.slug, 'test-book')
-        self.assertEqual(self.book_1.title, capitalize('test book'))
+        self.assertEqual(self.book_1.title, capitalize_str('test book'))
         self.assertEqual(self.book_1.slug, 'test-book-1')
 
     def test_book_data_invalid(self):
@@ -175,14 +172,14 @@ class BookModelTest(TestCase):
         book_taglist_1 = list(self.book_1.booktag.all())
         self.assertEqual(len(book_taglist), 2)
         self.assertEqual(len(book_taglist_1), 1)
-        self.assertEqual(book_taglist[0].name, capitalize('test tag'))
-        self.assertEqual(book_taglist[-1].name, capitalize('test tag 1'))
-        self.assertEqual(book_taglist_1[0].name, capitalize('test tag'))
+        self.assertEqual(book_taglist[0].name, capitalize_str('test tag'))
+        self.assertEqual(book_taglist[-1].name, capitalize_str('test tag 1'))
+        self.assertEqual(book_taglist_1[0].name, capitalize_str('test tag'))
         # m2m remove test
         self.book.booktag.remove(book_taglist[0])
         book_taglist = list(self.book.booktag.all())
         self.assertEqual(len(book_taglist), 1)
-        self.assertEqual(book_taglist[0].name, capitalize('test tag 1'))
+        self.assertEqual(book_taglist[0].name, capitalize_str('test tag 1'))
 
 
 class BookChapterTest(TestCase):
@@ -193,10 +190,10 @@ class BookChapterTest(TestCase):
         self.bookchapter_1 = BookChapter.objects.create(title='test chapter', book=self.book_1)
 
     def test_book_data(self):
-        self.assertEqual(self.bookchapter.title, capitalize('test chapter'))
-        self.assertEqual(self.bookchapter.book.title, capitalize('test book'))
-        self.assertEqual(self.bookchapter_1.title, capitalize('test chapter'))
-        self.assertEqual(self.bookchapter_1.book.title, capitalize('test book 1'))
+        self.assertEqual(self.bookchapter.title, capitalize_str('test chapter'))
+        self.assertEqual(self.bookchapter.book.title, capitalize_str('test book'))
+        self.assertEqual(self.bookchapter_1.title, capitalize_str('test chapter'))
+        self.assertEqual(self.bookchapter_1.book.title, capitalize_str('test book 1'))
 
     def test_book_data_invalid(self):
         self.assertNotEqual(self.bookchapter.title, '')

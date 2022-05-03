@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import re
 
@@ -33,9 +32,37 @@ class BookScraper:
         user_agent = user_agent.random
         self.driver_opts.add_argument(f'user-agent={user_agent}')
 
-    def get_book_volumes_webnovel(self, book_id: str) -> list:
+    def webnovel_get_book_data(self, book_url: str) -> list:
+        """GET webnovel book data with html_requests"""
+        session = HTMLSession()
+        r = session.get(book_url)
+        book = []
+        b_title_raw = r.html.find('h1.pt4')[0].text
+        b_title = ' '.join(b_title_raw.split(' ')[0:-1])
+        b_title_sm = r.html.find('h1.pt4 small')[0].text
+        b_desc_raw = r.html.find('.j_synopsis')[0].text
+        b_desc = ''.join([f'<p>{i}</p>' for i in b_desc_raw.split('\n') if i])
+        b_tags = [tag.text.replace('# ', '').lower() for tag in r.html.find('p.m-tag')]
+        try:
+            b_author = r.html.find('h2.ell.dib.vam span')[0].text
+        except IndexError:
+            b_author = ''
+        b_rating = float(r.html.find('._score.ell strong')[0].text)
+        b_poster_url = r.html.find('i.g_thumb img')[1].attrs['src']
+        book.append({
+            'book_title': b_title,
+            'book_title_sm': b_title_sm,
+            'book_description': b_desc,
+            'book_tags': b_tags,
+            'book_author': b_author,
+            'book_rating': b_rating,
+            'book_poster_url': b_poster_url,
+        })
+        return book
+
+    def webnovel_get_book_volumes(self, book_url: str) -> list:
         """GET webnovel book volumes with selenium"""
-        book_url = self.urls['webnovel'] + book_id
+        self.setup_user_agent()
         driver = webdriver.Chrome(chrome_options=self.driver_opts)
         wait = WebDriverWait(driver, 5)
         driver.get(book_url)
@@ -53,8 +80,12 @@ class BookScraper:
         return book_volumes
 
     def run(self):
-        book_id_wn = '20134751006091605'
-        print(self.get_book_volumes_webnovel(book_id_wn))
+        from pprint import pprint
+        book_ids = ['20134751006091605', '14187175405584205', '19100202406400905']
+        for b_id in book_ids:
+            book_url = self.urls['webnovel'] + b_id
+            pprint(self.webnovel_get_book_data(book_url))
+            print('')
 
 
 if __name__ == '__main__':

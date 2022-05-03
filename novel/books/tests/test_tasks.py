@@ -2,6 +2,7 @@ import factory
 from celery import states
 from django.test import TestCase, tag
 from django.db.models import signals
+from unittest import skip
 
 from ..models import Book, BookGenre, BookChapter
 from ..scrapers import BookScraper
@@ -15,6 +16,7 @@ from ..tasks import (
 )
 
 
+@skip('Ignore')
 class BookTasksTest(TestCase):
     @factory.django.mute_signals(signals.post_save)
     def setUp(self):

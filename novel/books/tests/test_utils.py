@@ -1,13 +1,7 @@
 from django.test import TestCase, tag
 
 from ..models import Book, BookGenre, BookChapter, BookChapterReplace
-from ..utils import capitalize_slug, capitalize_str, multiple_replace, upload_to_s3, spoon_feed, search_multiple_replace
-
-
-def update_book_title(obj):
-    obj.title = 'changed'
-    obj.save()
-    return obj
+from ..utils import *
 
 
 class UtilsTest(TestCase):
@@ -40,15 +34,19 @@ class UtilsTest(TestCase):
         self.assertNotIn('\n', text)
         self.assertNotIn('  ', text)
 
+    def update_book_title(self, obj):
+        obj.title = 'changed'
+        obj.save()
+        return obj
+
     @tag('slow')
     def test_spoon_feed(self):
         for i in range(100):
             Book.objects.create(title=f'test {i}', bookgenre=self.bookgenre)
         books = Book.objects.all()
-        [i for i in spoon_feed(books, update_book_title, chunk=10)]
-        Book.objects.last()
-        self.assertEqual('Changed', Book.objects.first())
-        self.assertEqual('Changed', Book.objects.last())
+        [i for i in spoon_feed(books, self.update_book_title, chunk=10)]
+        self.assertEqual('Changed', Book.objects.first().title)
+        self.assertEqual('Changed', Book.objects.last().title)
 
     # def test_search_multiple_replace(self):
     #     b_chap_qs = BookChapter.objects.order_by('pk').iterator(chunk_size=1000)

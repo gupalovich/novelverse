@@ -106,8 +106,7 @@ class BookScraper:
         return c_ids
 
     def webnovel_get_chap(self, chap_url: str) -> dict:
-        """GET webnovel book chapter data and comments with selenium
-        TODO: fix volume 0 chapters"""
+        """GET webnovel book chapter data and comments with selenium"""
         print(chap_url)
         driver = webdriver.Chrome(options=self.driver_opts)
         driver.get(chap_url)
@@ -116,9 +115,13 @@ class BookScraper:
             self.sel_find_css(driver, '.cha-content._lock')
         except NoSuchElementException:
             chap_title_raw = self.sel_find_css(driver, '.cha-tit h1').text
-            chap_title = re.split(
-                r':|-|–', chap_title_raw, maxsplit=1)[1].strip().replace('‽', '?!')
-            chap_id = int(re.findall(r'\d+', chap_title_raw)[0])
+            try:
+                chap_title = re.split(
+                    r':|-|–', chap_title_raw, maxsplit=1)[1].strip().replace('‽', '?!')
+                chap_id = int(re.findall(r'\d+', chap_title_raw)[0])
+            except IndexError:
+                chap_title = chap_title_raw
+                chap_id = 'info'
             chap_content_raw = self.sel_find_css(driver, '.cha-paragraph p', many=True)
             chap_content = ''.join([f'<p>{p.text}</p>' for p in chap_content_raw if p.text])
             chap_thoughts_raw = self.sel_find_css(driver, '.m-thou p', many=True)
@@ -128,11 +131,9 @@ class BookScraper:
             chap_comments_raw = self.sel_find_css(driver, '.m-comment-bd', many=True)
             chap_commments = []
             for comment in chap_comments_raw:
-                comment = comment.text
-                comment.replace('[img=update]', '')
+                comment = re.sub(r'\[img=\w+\]', '', comment.text)
                 if len(comment) > 3:
                     chap_commments.append(comment.capitalize())
-            print(chap_commments)
             chap_data.update({
                 'c_id': chap_id,
                 'c_title': chap_title,

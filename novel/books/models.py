@@ -166,6 +166,7 @@ class BookChapter(TimeStampedModel):
     title = models.CharField(_('Title'), blank=False, default='', max_length=255)
     slug = models.SlugField(default='', max_length=255, unique=True)
     text = models.TextField(blank=False, default='')
+    thoughts = models.TextField(blank=True, default='')
     origin = models.CharField(choices=VISIT_CHOICES, blank=True, default='', max_length=55)
 
     class Meta:

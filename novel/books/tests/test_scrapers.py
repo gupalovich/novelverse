@@ -45,6 +45,7 @@ class BookScraperTest(TestCase):
                 data = self.scraper.webnovel_get_chap_ids(url, s_from=2, s_to=12)
                 self.assertTrue(len(data) == 10)
 
+    @tag('slow')  # + 20s
     def test_webnovel_get_chap(self):
         """Test 3 chapter types: info-0, normal-1, locked-2"""
         for i, chap_id in enumerate(self.wn_chap_ids):

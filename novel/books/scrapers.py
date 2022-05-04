@@ -183,10 +183,14 @@ class BookScraper:
                 continue
             for pg in parags:
                 pg = pg.strip()
+                pg_letters = re.sub(r'[^a-zA-Z]+', '', pg.lower())
                 if not pg:
                     continue
                 if re.search(r"\[.*?\]", pg):  # between brackets [text]
                     chap_content += f'<p><b>{pg}</b></p>'
+                elif 'pandanovel' in pg_letters:
+                    with open('chap_watermarks.txt', 'a', encoding='utf-8') as f:
+                        f.write(pg + '\n')
                 else:
                     chap_content += f'<p>{pg}</p>'
         chap_data.update({
@@ -199,10 +203,17 @@ class BookScraper:
 
     def run(self):
         from pprint import pprint
-        book_ids = ['blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122', 'birth-of-the-demonic-sword(IN)-74']
-        for b_id in book_ids:
-            url = self.urls['pandanovel'] + 'details/' + b_id
-            pprint(self.panda_get_chap_ids(url))
+        url = 'https://www.panda-novel.com/content/blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122-998260/chapter'
+        while True:
+            try:
+                data = self.panda_get_chap(url)
+                url = data['c_next']
+                print(data['c_id'], data['c_title'])
+                if not url:
+                    print('Stopped at:', data['c_id'])
+                    break
+            except Exception as e:
+                print(e)
 
 
 if __name__ == '__main__':

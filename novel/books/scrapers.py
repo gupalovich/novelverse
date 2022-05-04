@@ -1,5 +1,4 @@
 import logging
-import time
 import re
 
 from django.utils.text import slugify
@@ -9,11 +8,11 @@ from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from fake_useragent import UserAgent
 
-from .models import Book, BookChapter, BookTag  # comment to execute '__main__'
-from .utils import *  # comment to execute '__main__'
+# from .models import Book, BookChapter, BookTag  # comment to execute '__main__'
+# from .utils import *  # comment to execute '__main__'
 
 
 class BookScraper:
@@ -21,7 +20,7 @@ class BookScraper:
         self.urls = {
             'webnovel': 'https://www.webnovel.com/book/',
             'boxnovel': 'https://boxnovel.com/novel/',
-            'gravitytales': 'https://www.gravitytales.net/',
+            'pandanovel': 'https://www.panda-novel.com/',
         }
         self.driver_opts = webdriver.ChromeOptions()
         # self.driver_opts.add_argument('headless')
@@ -149,12 +148,29 @@ class BookScraper:
         driver.close()
         return chap_data
 
+    def panda_get_chap_ids(self, book_url: str) -> list:
+        driver = webdriver.Chrome(options=self.driver_opts)
+        driver.get(book_url)
+        self.sel_wait_until(driver, '.chapter-list')
+        chaps_raw = self.sel_find_css(driver, '.chapter-list ul li a', many=True)
+        chaps = []
+        for chap in chaps_raw:
+            try:
+                chap = chap.get_attribute('href')
+                if not chap:
+                    continue
+                elif '/chapter-' in chap:
+                    chaps.append(chap)
+            except StaleElementReferenceException:
+                continue
+        return chaps
+
     def run(self):
         from pprint import pprint
-        book_ids = ['20134751006091605', '14187175405584205', '19100202406400905']
-        chap_ids = ['54048846463951458', '54201840178355633', '54827256119359229']
-        b_chap_url = f'{self.urls["webnovel"]}{book_ids[0]}/{chap_ids[0]}'
-        pprint(self.webnovel_get_chap(b_chap_url))
+        book_ids = ['blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122', 'birth-of-the-demonic-sword(IN)-74']
+        for b_id in book_ids:
+            url = self.urls['pandanovel'] + 'details/' + b_id
+            pprint(self.panda_get_chap_ids(url))
 
 
 if __name__ == '__main__':

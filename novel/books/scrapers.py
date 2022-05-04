@@ -125,7 +125,12 @@ class BookScraper:
             chap_content_raw = self.sel_find_css(driver, '.cha-paragraph p', many=True)
             chap_content = ''.join([f'<p>{p.text}</p>' for p in chap_content_raw if p.text])
             chap_thoughts_raw = self.sel_find_css(driver, '.m-thou p', many=True)
-            chap_thoughts = ''.join([f'<p>{p.text}</p>' for p in chap_thoughts_raw if p.text])
+            chap_thoughts = ''
+            for p in chap_thoughts_raw:  # filter whatever 'thoughts' here
+                p_text = p.text
+                if not p_text or 'webnovel' in p_text:
+                    continue
+                chap_thoughts += f'<p>{p_text}</p>'
             self.sel_find_css(driver, 'a.j_comments').click()
             self.sel_wait_until(driver, '.m-comment-bd')
             chap_comments_raw = self.sel_find_css(driver, '.m-comment-bd', many=True)

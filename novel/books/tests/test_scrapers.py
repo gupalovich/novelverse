@@ -13,6 +13,9 @@ class BookScraperTest(TestCase):
         self.pd_book_ids = [
             'blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122',
             'birth-of-the-demonic-sword(IN)-74']
+        self.pd_chap_urls = [
+            'https://www.panda-novel.com/content/blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122-798371/chapter-1--soul-records',
+            'https://www.panda-novel.com/content/birth-of-the-demonic-sword(IN)-74-76726/chapter-1--01-birth']
 
     @tag('slow')  # +3s
     def test_webnovel_get_book_data(self):
@@ -68,11 +71,19 @@ class BookScraperTest(TestCase):
 
     @tag('slow')  # + 10s
     def test_panda_get_chap_ids(self):
-        chap_names = [
-            'https://www.panda-novel.com/content/blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122-798371/chapter-1--soul-records',
-            'https://www.panda-novel.com/content/birth-of-the-demonic-sword(IN)-74-76726/chapter-1--01-birth']
         for i, book_id in enumerate(self.pd_book_ids):
             url = self.scraper.urls['pandanovel'] + 'details/' + book_id
             data = self.scraper.panda_get_chap_ids(url)
             self.assertTrue(len(data) >= 10)
-            self.assertTrue(chap_names[i] in data)
+            self.assertTrue(self.pd_chap_urls[i] in data)
+
+    @tag('slow')  # + 10s
+    def test_panda_get_chap(self):
+        for url in self.pd_chap_urls:
+            data = self.scraper.panda_get_chap(self.pd_chap_urls[0])
+            self.assertTrue(isinstance(data, dict))
+            self.assertTrue(len(data) == 4)
+            self.assertTrue(isinstance(data['c_id'], int))
+            self.assertTrue(len(data['c_title']) >= 4)
+            self.assertTrue(len(data['c_content']) >= 500)
+            self.assertTrue('panda-novel.com/content' in data['c_next'])

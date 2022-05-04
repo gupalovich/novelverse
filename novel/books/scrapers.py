@@ -165,6 +165,38 @@ class BookScraper:
                 continue
         return chaps
 
+    def panda_get_chap(self, chap_url: str) -> dict:
+        chap_data = {}
+        driver = webdriver.Chrome(options=self.driver_opts)
+        driver.get(chap_url)
+        self.sel_wait_until(driver, '.novel-content')
+        chap_title_raw = self.sel_find_css(driver, '.novel-content h2').text
+        chap_title = re.split(
+            r':|-|–|\s', chap_title_raw, maxsplit=1)[1].strip().replace('‽', '?!')
+        chap_id = int(re.findall(r'\d+', chap_title_raw)[0])
+        chap_next = self.sel_find_css(driver, 'a.btn-next').get_attribute('href')
+        chap_content_raw = self.sel_find_css(driver, '.novel-content div', many=True)
+        chap_content = ''
+        for p_raw in chap_content_raw:
+            parags = p_raw.text.split('\n')
+            if not parags:
+                continue
+            for pg in parags:
+                pg = pg.strip()
+                if not pg:
+                    continue
+                if re.search(r"\[.*?\]", pg):  # between brackets [text]
+                    chap_content += f'<p><b>{pg}</b></p>'
+                else:
+                    chap_content += f'<p>{pg}</p>'
+        chap_data.update({
+            'c_id': chap_id,
+            'c_title': chap_title,
+            'c_content': chap_content,
+            'c_next': chap_next,
+        })
+        return chap_data
+
     def run(self):
         from pprint import pprint
         book_ids = ['blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122', 'birth-of-the-demonic-sword(IN)-74']

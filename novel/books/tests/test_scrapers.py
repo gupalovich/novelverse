@@ -10,6 +10,42 @@ from ..scrapers import BookScraper
 
 class BookScraperTest(TestCase):
     def setUp(self):
+        self.scraper = BookScraper()
+        self.client = Client()
+        self.wn_book_ids = ['20134751006091605', '14187175405584205', '19100202406400905']
+        self.wn_chap_ids = ['54048846463951458', '54201840178355633', '54827256119359229']
+
+    @tag('slow')  # +3s
+    def test_webnovel_get_book_data(self):
+        for book_id in self.wn_book_ids:
+            url = self.scraper.urls['webnovel'] + book_id
+            data = self.scraper.webnovel_get_book_data(url)
+            self.assertTrue(len(data) == 7)
+            self.assertTrue(len(data['book_title']))
+            self.assertTrue(len(data['book_description']) >= 100)
+            self.assertTrue('img' in data['book_poster_url'])
+
+    @tag('slow')  # + 8s
+    def test_webnovel_get_book_volumes(self):
+        url = self.scraper.urls['webnovel'] + self.wn_book_ids[0]
+        data = self.scraper.webnovel_get_book_volumes(url)
+        print(data)
+        self.assertTrue(len(data) >= 2)
+        for i in data:
+            self.assertTrue(isinstance(i, int))
+
+    @tag('slow')  # + 20s
+    def test_webnovel_get_chap_ids(self):
+        for i, book_id in enumerate(self.wn_book_ids):
+            url = self.scraper.urls['webnovel'] + book_id
+            if i == 0:
+                data = self.scraper.webnovel_get_chap_ids(url)
+                self.assertTrue(len(data) >= 500)
+            else:
+                data = self.scraper.webnovel_get_chap_ids(url, s_from=2, s_to=12)
+                self.assertTrue(len(data) == 10)
+
+    def test_webnovel_get_chap(self):
         pass
 
 

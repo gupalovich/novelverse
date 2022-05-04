@@ -12,8 +12,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from fake_useragent import UserAgent
 
-# from .models import Book, BookChapter, BookTag  # comment to execute '__main__'
-# from .utils import *  # comment to execute '__main__'
+from .models import Book, BookChapter, BookTag  # comment to execute '__main__'
+from .utils import *  # comment to execute '__main__'
 
 
 class BookScraper:
@@ -41,11 +41,15 @@ class BookScraper:
         else:
             return driver.find_element(by=By.CSS_SELECTOR, value=selector)
 
-    def webnovel_get_book_data(self, book_url: str) -> list:
+    def sel_wait_until(self, driver, selector, delay=5):
+        wait = WebDriverWait(driver, delay)
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
+
+    def webnovel_get_book_data(self, book_url: str) -> dict:
         """GET webnovel book data with html_requests"""
         session = HTMLSession()
         r = session.get(book_url)
-        book = []
+        book = {}
         b_title_raw = r.html.find('h1.pt4')[0].text
         b_title = ' '.join(b_title_raw.split(' ')[0:-1])
         b_title_sm = r.html.find('h1.pt4 small')[0].text
@@ -58,7 +62,7 @@ class BookScraper:
             b_author = ''
         b_rating = float(r.html.find('._score.ell strong')[0].text)
         b_poster_url = r.html.find('i.g_thumb img')[1].attrs['src']
-        book.append({
+        book.update({
             'book_title': b_title,
             'book_title_sm': b_title_sm,
             'book_description': b_desc,
@@ -73,15 +77,14 @@ class BookScraper:
         """GET webnovel book volumes with selenium"""
         # self.setup_user_agent()
         driver = webdriver.Chrome(options=self.driver_opts)
-        wait = WebDriverWait(driver, 5)
         driver.get(book_url)
-        driver.find_element(by=By.CSS_SELECTOR, value='a.j_show_contents').click()
-        volumes = wait.until(
-            lambda driver: driver.find_elements(by=By.CSS_SELECTOR, value='.volume-item'))
+        self.sel_find_css(driver, 'a.j_show_contents').click()
+        self.sel_wait_until(driver, '.volume-item')
+        volumes = self.sel_find_css(driver, '.volume-item', many=True)
         book_volumes = [1, ]
         for volume in volumes:
-            chap_len = len(driver.find_elements(by=By.CSS_SELECTOR, value='.volume-item ol li'))
-            volume_len = len(volume.find_elements(by=By.CSS_SELECTOR, value='ol li'))
+            chap_len = len(self.sel_find_css(driver, '.volume-item ol li', many=True))
+            volume_len = len(self.sel_find_css(volume, 'ol li', many=True))
             volume_len += book_volumes[-1]
             if volume_len - 1 != chap_len:
                 book_volumes.append(volume_len)
@@ -92,15 +95,12 @@ class BookScraper:
         """GET webnovel book chapter ids with selenium"""
         # self.setup_user_agent()
         driver = webdriver.Chrome(options=self.driver_opts)
-        wait = WebDriverWait(driver, 5)
         driver.get(book_url)
-        driver.find_element(by=By.CSS_SELECTOR, value='a.j_show_contents').click()
+        self.sel_find_css(driver, 'a.j_show_contents').click()
+        self.sel_wait_until(driver, '.content-list')
+        c_list = self.sel_find_css(driver, '.content-list li', many=True)
         if s_to:
-            c_list = wait.until(
-                lambda driver: driver.find_elements(by=By.CSS_SELECTOR, value='.content-list li')[s_from:s_to])
-        else:
-            c_list = wait.until(lambda driver: driver.find_elements(
-                by=By.CSS_SELECTOR, value='.content-list li'))
+            c_list = c_list[s_from:s_to]
         c_ids = [li.get_attribute("data-cid") for li in c_list]
         driver.close()
         return c_ids
@@ -110,7 +110,6 @@ class BookScraper:
         TODO: fix volume 0 chapters"""
         print(chap_url)
         driver = webdriver.Chrome(options=self.driver_opts)
-        wait = WebDriverWait(driver, 5)
         driver.get(chap_url)
         chap_data = {}
         try:
@@ -125,7 +124,7 @@ class BookScraper:
             chap_thoughts_raw = self.sel_find_css(driver, '.m-thou p', many=True)
             chap_thoughts = ''.join([f'<p>{p.text}</p>' for p in chap_thoughts_raw if p.text])
             self.sel_find_css(driver, 'a.j_comments').click()
-            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.m-comment-bd')))
+            self.sel_wait_until(driver, '.m-comment-bd')
             chap_comments_raw = self.sel_find_css(driver, '.m-comment-bd', many=True)
             chap_commments = []
             for comment in chap_comments_raw:

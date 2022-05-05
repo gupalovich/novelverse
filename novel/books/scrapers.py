@@ -23,7 +23,7 @@ class BookScraper:
             'pandanovel': 'https://www.panda-novel.com/',
         }
         self.driver_opts = webdriver.ChromeOptions()
-        # self.driver_opts.add_argument('headless')
+        self.driver_opts.add_argument('headless')
         self.driver_opts.add_argument('disable-gpu')
         self.driver_opts.add_argument('log-level=3')
         self.driver_opts.add_argument('lang=en-US')
@@ -171,8 +171,13 @@ class BookScraper:
         driver.get(chap_url)
         self.sel_wait_until(driver, '.novel-content')
         chap_title_raw = self.sel_find_css(driver, '.novel-content h2').text
-        chap_title = re.split(
-            r':|-|–|\s', chap_title_raw, maxsplit=1)[1].strip().replace('‽', '?!')
+        try:
+            chap_title = re.split(
+                r':|-|–', chap_title_raw, maxsplit=1)[1]
+        except IndexError:
+            """TODO: str w/o number will break normal order"""
+            chap_title = re.split(r'\s+', chap_title_raw, maxsplit=1)[1]
+        chap_title = chap_title.strip().replace('‽', '?!')
         chap_id = int(re.findall(r'\d+', chap_title_raw)[0])
         chap_next = self.sel_find_css(driver, 'a.btn-next').get_attribute('href')
         chap_content_raw = self.sel_find_css(driver, '.novel-content div', many=True)
@@ -186,7 +191,7 @@ class BookScraper:
                 pg_letters = re.sub(r'[^a-zA-Z]+', '', pg.lower())
                 if not pg:
                     continue
-                if re.search(r"\[.*?\]", pg):  # between brackets [text]
+                if re.search(r"\[.*?\]", pg) or re.search(r"\*.*?\*", pg):  # between [ ] or * *
                     chap_content += f'<p><b>{pg}</b></p>'
                 elif 'pandanovel' in pg_letters:
                     with open('chap_watermarks.txt', 'a', encoding='utf-8') as f:
@@ -203,7 +208,7 @@ class BookScraper:
 
     def run(self):
         from pprint import pprint
-        url = 'https://www.panda-novel.com/content/blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122-998260/chapter'
+        url = 'https://www.panda-novel.com/content/the-oracle-paths(JN)-162-165078/chapter-1-the-day-everything-changed'
         while True:
             try:
                 data = self.panda_get_chap(url)

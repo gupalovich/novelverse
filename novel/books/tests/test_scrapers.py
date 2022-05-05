@@ -80,7 +80,7 @@ class BookScraperTest(TestCase):
     @tag('slow')  # + 10s
     def test_panda_get_chap(self):
         for url in self.pd_chap_urls:
-            data = self.scraper.panda_get_chap(self.pd_chap_urls[0])
+            data = self.scraper.panda_get_chap(url)
             self.assertTrue(isinstance(data, dict))
             self.assertTrue(len(data) == 4)
             self.assertTrue(isinstance(data['c_id'], int))

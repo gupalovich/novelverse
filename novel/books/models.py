@@ -12,10 +12,7 @@ from .utils import get_unique_slug, capitalize_str
 
 VISIT_CHOICES = Choices(
     ('webnovel', 'Webnovel'),
-    ('boxnovel', 'Boxnovel'),
     ('pandanovel', 'Pandanovel'),
-    ('wuxiaworld', 'Wuxia World'),
-    ('lnmtl', 'LNMTL'),
     ('other', 'Other'), )
 
 

@@ -122,7 +122,7 @@ class ModelUtils:
     def __init__(self):
         pass
 
-    def filter_db_books(self, qs, revisit=False):
+    def filter_books_visit(self, qs, revisit=False):
         """Return QuerySet of filtered Books by visit/revisit column"""
         if revisit:
             books = qs.filter(visited=True).exclude(revisit_id__exact='')
@@ -130,17 +130,23 @@ class ModelUtils:
             books = qs.filter(visited=False).exclude(visit_id__exact='')
         return books
 
-    def create_book_tag(self, name):
+    def create_book_tag(self, tag_name: str):
         """TODO: Check for book_tag similarity 85-90%"""
-        slug_name = slugify(name)
+        slug_name = slugify(tag_name)
         tag = BookTag.objects.filter(slug=slug_name).exists()
         if not tag:
-            logging.info(f'-- Creating tag: {name}')
-            booktag = BookTag.objects.create(name=name)
+            logging.info(f'-- Creating tag: {tag_name}')
+            booktag = BookTag.objects.create(name=tag_name)
             return booktag
         return False
 
-    def add_book_booktag(self, book, tag_name):
+    def create_book_chapter(self, book, c_id, title, text, thoughts='', origin=''):
+        print(f'- Creating book_chapter: {title}')
+        bookchapter = BookChapter.objects.create(
+            book=book, c_id=c_id, title=title, text=text, thoughts=thoughts, origin=origin)
+        return bookchapter
+
+    def add_book_booktag(self, book, tag_name: str):
         """Adds booktag to book if not exist"""
         try:
             booktag = BookTag.objects.get(slug=slugify(tag_name))
@@ -151,3 +157,26 @@ class ModelUtils:
             return False
         except (BookTag.DoesNotExist, Book.DoesNotExist) as e:
             raise e
+
+    def update_book_data(self, book, data: dict):
+        """Update book object with scraped data
+           TODO: chap_release"""
+        print(f'- Updating book: {book}')
+        book.title = data['book_title']
+        book.title_sm = data['book_title_sm']
+        book.author.append(data['book_info_author']) if data['book_info_author'] not in book.author else False
+        book.description = data['book_description']
+        if len(book.volumes) != len(data['book_volumes']):
+            [book.volumes.append(volume) for volume in data['book_volumes']]
+        poster_filename = download_img(data['book_poster_url'], slugify(data['book_name']))
+        book.poster = f'posters/{poster_filename}'
+        book.rating = data['book_rating']
+        # if data['chap_release'] == 'completed':
+        #     book.status_release = 1
+        # elif isinstance(data['chap_release'], int):
+        #     book.chapters_release = data['chap_release']
+        for tag in data['book_tag_list']:
+            self.create_book_tag(tag)
+            self.add_book_booktag(book, tag)
+        book.visited = True
+        # book.save()  # prevent celery post_save closure

@@ -29,23 +29,27 @@ class BookScraper:
         self.driver_opts.add_argument('lang=en-US')
         self.driver_opts.add_argument('silent')
 
-    def setup_user_agent(self) -> None:
+    def setup_user_agent(self):
         user_agent = UserAgent()
         user_agent = user_agent.random
         self.driver_opts.add_argument(f'user-agent={user_agent}')
 
     def sel_find_css(self, driver, selector, many=False):
+        """Selenium find_element/s shortcut"""
         if many:
             return driver.find_elements(by=By.CSS_SELECTOR, value=selector)
         else:
             return driver.find_element(by=By.CSS_SELECTOR, value=selector)
 
     def sel_wait_until(self, driver, selector, delay=5):
+        """Selenium wait.until shortcut"""
         wait = WebDriverWait(driver, delay)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
 
     def webnovel_get_book_data(self, book_url: str) -> dict:
-        """GET webnovel book data with html_requests"""
+        """GET webnovel book data with html_requests
+           TODO: chap_release_raw = r.html.find('.det-hd-detail strong')[0].text
+                 chap_release = chap_release_raw.lower().strip() if len(chap_release_raw) < 20 else int(re.findall('\d+', chap_release_raw)[0])"""
         session = HTMLSession()
         r = session.get(book_url)
         book = {}
@@ -144,6 +148,7 @@ class BookScraper:
                 'c_content': chap_content,
                 'c_thoughts': chap_thoughts,
                 'c_comments': chap_commments,
+                'c_origin': 'webnovel',
             })
         driver.close()
         return chap_data
@@ -203,6 +208,7 @@ class BookScraper:
             'c_title': chap_title,
             'c_content': chap_content,
             'c_next': chap_next,
+            'c_origin': 'pandanovel',
         })
         return chap_data
 
@@ -239,120 +245,6 @@ class BookScraper2:
         self.driver_opts.add_argument('disable-gpu')
         self.driver_opts.add_argument('log-level=3')
         self.driver_opts.add_argument('silent')
-
-    def update_db_book_data(self, book, data):
-        print(f'Updating book: {book}')
-        data = data[0] if isinstance(data, list) else data
-        book.title = data['book_name']
-        book.title_sm = data['book_name_sm']
-        book.author.append(data['book_info_author']) if data['book_info_author'] not in book.author else False
-        if len(book.description) < 100:
-            book.description = data['book_desc']
-        if len(book.volumes) != len(data['book_volumes']):
-            [book.volumes.append(volume) for volume in data['book_volumes']]
-        poster_filename = download_img(data['book_poster_url'], slugify(data['book_name']))
-        book.poster = f'posters/{poster_filename}'
-        s3_uploaded = upload_to_s3(f'novel2read/media/{book.poster}', bucket_path='media/posters', public_read=True)
-        if s3_uploaded:
-            print('Poster uploaded to s3')
-        book.rating = data['book_rating']
-        if data['chap_release'] == 'completed':
-            book.status_release = 1
-        elif isinstance(data['chap_release'], int):
-            book.chapters_release = data['chap_release']
-        for tag in data['book_tag_list']:
-            self.create_book_tag(tag)
-            self.add_book_booktag(book, tag)
-        book.visited = True
-        # book.save()  # prevent celery post_save closure
-
-    def create_book_chapter(self, book, c_title, c_content):
-        print(f'Creating: {c_title}')
-        bookchapter = BookChapter.objects.create(book=book, title=c_title, text=c_content)
-        return bookchapter
-
-    def wn_get_book_data(self, book_url):
-        driver = webdriver.Chrome(chrome_options=self.driver_opts)
-        wait = WebDriverWait(driver, 5)
-        driver.get(book_url)
-        driver.find_element_by_css_selector('a.j_show_contents').click()
-        v_list = wait.until(lambda driver: driver.find_elements_by_css_selector('.volume-item'))
-        book_volumes = [1]
-        for volume in v_list:
-            chap_len = len(driver.find_elements_by_css_selector('.volume-item ol li'))
-            volume_len = len(volume.find_elements_by_css_selector('ol li'))
-            volume_len += book_volumes[-1]
-            if volume_len - 1 != chap_len:
-                book_volumes.append(volume_len)
-        driver.close()
-
-        session = HTMLSession()
-        r = session.get(book_url)
-        book_name_raw = r.html.find('.pt4.pb4.oh.mb4')[0].text
-        book_name = ' '.join(book_name_raw.split(' ')[0:-1]).replace('‽', '?!')
-        book_name_sm = book_name_raw.split(' ')[-1]
-        chap_release_raw = r.html.find('.det-hd-detail strong')[0].text
-        chap_release = chap_release_raw.lower().strip() if len(chap_release_raw) < 20 else int(re.findall('\d+', chap_release_raw)[0])
-        book_info_chap_count_raw = r.html.find('.det-hd-detail strong')[1].text
-        book_info_chap_count = int(re.findall('\d+', book_info_chap_count_raw)[0])
-        book_info_author = r.html.find('.ell.dib.vam span')[0].text
-        book_rating = float(r.html.find('._score.ell strong')[0].text)
-        book_poster_url = ''.join(r.html.find('i.g_thumb img')[1].attrs['srcset'].split(' '))
-        book_desc_raw = r.html.find('p.mb48.fs16.c_000')[0].html.split('<br/>')
-        book_desc_raw = ['' if 'webnovel' in p.lower() else p for p in book_desc_raw]
-        book_desc_raw = [multiple_replace(self.to_repl, p.strip()) for p in book_desc_raw]
-        book_desc = ''.join([f"<p>{re.sub(r'<.*?>', '', text)}</p>" for text in book_desc_raw]).replace('<p></p>', '')
-        book_tag_list = [a.text.strip() for a in r.html.find('.pop-tags a')]
-
-        book = []
-        book.append({
-            'book_name': book_name,
-            'book_name_sm': book_name_sm,
-            'chap_release': chap_release,
-            'book_info_chap_count': book_info_chap_count,
-            'book_info_author': book_info_author,
-            'book_volumes': book_volumes,
-            'book_rating': book_rating,
-            'book_poster_url': book_poster_url,
-            'book_desc': book_desc,
-            'book_tag_list': book_tag_list,
-        })
-        return book
-
-    def wn_get_book_cids(self, book_url, s_from=0, s_to=0):
-        driver = webdriver.Chrome(chrome_options=self.driver_opts)
-        wait = WebDriverWait(driver, 5)
-        driver.get(book_url)
-        # DOM
-        driver.find_element_by_css_selector('a.j_show_contents').click()
-        if s_to:
-            c_list = wait.until(lambda driver: driver.find_elements_by_css_selector('.content-list li')[s_from:s_to])
-        else:
-            c_list = wait.until(lambda driver: driver.find_elements_by_css_selector('.content-list li'))
-        c_ids = [li.get_attribute("data-cid") for li in c_list]
-        driver.close()
-        return c_ids
-
-    def wn_get_book_chap(self, chap_url):
-        session = HTMLSession()
-        r_chap = session.get(chap_url)
-        print(chap_url)
-        chap_tit_raw = r_chap.html.find('.cha-tit h3')[0].text
-        chap_lock = r_chap.html.find('.cha-content._lock')
-
-        if len(chap_lock) == 0:
-            chap_tit = re.split(r':|-|–', chap_tit_raw, maxsplit=1)[1].strip().replace('‽', '?!')
-            chap_tit_id = int(re.findall('\d+', chap_tit_raw)[0])
-
-            chap_content_raw = r_chap.html.find('.cha-words p')
-            chap_content_filtered = self.raw_html_text_filter(chap_content_raw)
-            b_chap = {
-                'c_id': chap_tit_id,
-                'c_title': chap_tit,
-                'c_content': ''.join(chap_content_filtered),
-            }
-            return b_chap
-        return chap_tit_raw
 
     def wn_get_update_book_chaps(self, book, book_url, c_ids):
         b_chap_url = ''

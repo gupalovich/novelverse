@@ -8,8 +8,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.utils.text import slugify
 
-from .models import Book, BookTag, BookChapter
-
 
 def download_img(url, file_name, folder='posters'):
     """Download bytes from url and save it to MEDIA_ROOT/folder"""
@@ -132,6 +130,7 @@ class ModelUtils:
 
     def create_book_tag(self, tag_name: str):
         """TODO: Check for book_tag similarity 85-90%"""
+        from .models import BookTag
         slug_name = slugify(tag_name)
         tag = BookTag.objects.filter(slug=slug_name).exists()
         if not tag:
@@ -142,6 +141,7 @@ class ModelUtils:
 
     def create_book_chapter(self, book, c_id, title, text, thoughts='', origin=''):
         print(f'- Creating book_chapter: {title}')
+        from .models import BookChapter
         bookchapter = BookChapter.objects.create(
             book=book, c_id=c_id, title=title, text=text, thoughts=thoughts, origin=origin)
         return bookchapter
@@ -149,6 +149,7 @@ class ModelUtils:
     def add_book_booktag(self, book, tag_name: str):
         """Adds booktag to book if not exist"""
         try:
+            from .models import Book, BookTag
             booktag = BookTag.objects.get(slug=slugify(tag_name))
             if booktag not in book.booktag.all():
                 logging.info(f'- Adding: {tag_name}')
@@ -175,8 +176,8 @@ class ModelUtils:
         #     book.status_release = 1
         # elif isinstance(data['chap_release'], int):
         #     book.chapters_release = data['chap_release']
-        for tag in data['book_tag_list']:
-            self.create_book_tag(tag)
-            self.add_book_booktag(book, tag)
+        # for tag in data['book_tags']:
+        #     self.create_book_tag(tag)
+        #     self.add_book_booktag(book, tag)
         book.visited = True
         # book.save()  # prevent celery post_save closure

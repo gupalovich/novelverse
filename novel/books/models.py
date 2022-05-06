@@ -63,6 +63,7 @@ class BookTag(TimeStampedModel):
 
 
 class Book(TimeStampedModel):
+    """TODO: make chapters_release dynamic"""
     objects = BookManager()
     title = models.CharField(_('Title'), blank=False, default='', max_length=255)
     title_sm = models.CharField(_('Title short'), blank=True, default='', max_length=50)

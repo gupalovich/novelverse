@@ -8,7 +8,7 @@ class BookScraperTest(TestCase):
     def setUp(self):
         self.scraper = BookScraper()
         self.client = Client()
-        self.wn_book_ids = ['20134751006091605', '14187175405584205', '19100202406400905']
+        self.wn_book_ids = ['20134751006091605', '11022733006234505', '19100202406400905']
         self.wn_chap_ids = ['54201840178355633', '54048846463951458', '54827256119359229']
         self.pd_book_ids = [
             'blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122',
@@ -17,15 +17,19 @@ class BookScraperTest(TestCase):
             'https://www.panda-novel.com/content/blood-warlock-succubus-partner-in-the-apocalypse(IN)-1122-798371/chapter-1--soul-records',
             'https://www.panda-novel.com/content/birth-of-the-demonic-sword(IN)-74-76726/chapter-1--01-birth']
 
-    @tag('slow')  # +3s
-    def test_webnovel_get_book_data(self):
+    @tag('slow')  # +3-40s
+    def test_webnovel_get_book_data(self, volumes=False):  # volumes add 30s+ to test
         for book_id in self.wn_book_ids:
             url = self.scraper.urls['webnovel'] + book_id
-            data = self.scraper.webnovel_get_book_data(url)
-            self.assertTrue(len(data) == 7)
+            data = self.scraper.webnovel_get_book_data(url, volumes=volumes)
+            self.assertTrue(len(data) == 8)
             self.assertTrue(len(data['book_title']))
             self.assertTrue(len(data['book_description']) >= 100)
             self.assertTrue('img' in data['book_poster_url'])
+            self.assertTrue(isinstance(data['book_tags'], list))
+            self.assertTrue(len(data['book_poster_url']) >= 10)
+            self.assertTrue(isinstance(data['book_volumes'], list))
+            self.assertTrue(len(data['book_volumes']) >= 1)
 
     @tag('slow')  # + 8s
     def test_webnovel_get_book_volumes(self):
@@ -58,16 +62,17 @@ class BookScraperTest(TestCase):
                 self.assertFalse(len(data))
                 continue
             elif i == 1:
-                self.assertTrue(len(data) == 5)
+                self.assertTrue(len(data) == 6)
                 self.assertTrue(data['c_id'] == 1)
                 self.assertTrue(len(data['c_thoughts']) >= 200)
             elif i == 0:
-                self.assertTrue(len(data) == 5)
+                self.assertTrue(len(data) == 6)
                 self.assertTrue(data['c_id'] == 'info')
             self.assertTrue(len(data['c_title']) >= 5)
             self.assertTrue(len(data['c_content']) >= 200)
             self.assertTrue(isinstance(data['c_comments'], list))
             self.assertTrue(len(data['c_comments']) >= 5)
+            self.assertTrue(data['c_origin'] == 'webnovel')
 
     @tag('slow')  # + 10s
     def test_panda_get_chap_ids(self):
@@ -75,14 +80,13 @@ class BookScraperTest(TestCase):
             url = self.scraper.urls['pandanovel'] + 'details/' + book_id
             data = self.scraper.panda_get_chap_ids(url)
             self.assertTrue(len(data) >= 10)
-            self.assertTrue(self.pd_chap_urls[i] in data)
 
     @tag('slow')  # + 10s
     def test_panda_get_chap(self):
         for url in self.pd_chap_urls:
             data = self.scraper.panda_get_chap(url)
             self.assertTrue(isinstance(data, dict))
-            self.assertTrue(len(data) == 4)
+            self.assertTrue(len(data) == 5)
             self.assertTrue(isinstance(data['c_id'], int))
             self.assertTrue(len(data['c_title']) >= 4)
             self.assertTrue(len(data['c_content']) >= 500)

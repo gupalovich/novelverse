@@ -23,7 +23,7 @@ class BookScraper:
             'pandanovel': 'https://www.panda-novel.com/',
         }
         self.driver_opts = webdriver.ChromeOptions()
-        self.driver_opts.add_argument('headless')
+        # self.driver_opts.add_argument('headless')
         self.driver_opts.add_argument('disable-gpu')
         self.driver_opts.add_argument('log-level=3')
         self.driver_opts.add_argument('lang=en-US')
@@ -46,10 +46,8 @@ class BookScraper:
         wait = WebDriverWait(driver, delay)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
 
-    def webnovel_get_book_data(self, book_url: str) -> dict:
-        """GET webnovel book data with html_requests
-           TODO: chap_release_raw = r.html.find('.det-hd-detail strong')[0].text
-                 chap_release = chap_release_raw.lower().strip() if len(chap_release_raw) < 20 else int(re.findall('\d+', chap_release_raw)[0])"""
+    def webnovel_get_book_data(self, book_url: str, volumes=True) -> dict:
+        """GET webnovel book data with html_requests"""
         session = HTMLSession()
         r = session.get(book_url)
         book = {}
@@ -65,6 +63,7 @@ class BookScraper:
             b_author = ''
         b_rating = float(r.html.find('._score.ell strong')[0].text)
         b_poster_url = r.html.find('i.g_thumb img')[1].attrs['src']
+        b_volumes = self.webnovel_get_book_volumes(book_url) if volumes else [1, ]
         book.update({
             'book_title': b_title,
             'book_title_sm': b_title_sm,
@@ -73,6 +72,7 @@ class BookScraper:
             'book_author': b_author,
             'book_rating': b_rating,
             'book_poster_url': b_poster_url,
+            'book_volumes': b_volumes,
         })
         return book
 
@@ -171,6 +171,7 @@ class BookScraper:
         return chaps
 
     def panda_get_chap(self, chap_url: str) -> dict:
+        """TODO: Watermark removal"""
         chap_data = {}
         driver = webdriver.Chrome(options=self.driver_opts)
         driver.get(chap_url)

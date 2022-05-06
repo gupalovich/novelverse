@@ -8,8 +8,11 @@ from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.utils.text import slugify
 
+from .models import Book, BookTag, BookChapter
+
 
 def download_img(url, file_name, folder='posters'):
+    """Download bytes from url and save it to MEDIA_ROOT/folder"""
     url = f'https:{url}' if url[0:1] == '/' else url
     resp = requests.get(url)
     resp_type = resp.headers['content-type']
@@ -87,7 +90,6 @@ def spoon_feed(qs, func, chunk=1000, start=0):
 
 def search_multiple_replace():
     """TODO: Refactor this monstrosity"""
-    from .models import BookChapter
     b_chaps = BookChapter.objects.order_by('pk')
     # to_repls = BookChapterReplace.objects.order_by('pk')
     result = []
@@ -114,3 +116,38 @@ def search_multiple_replace():
     #             b_chap.save()
 
     return result
+
+
+class ModelUtils:
+    def __init__(self):
+        pass
+
+    def filter_db_books(self, qs, revisit=False):
+        """Return QuerySet of filtered Books by visit/revisit column"""
+        if revisit:
+            books = qs.filter(visited=True).exclude(revisit_id__exact='')
+        else:
+            books = qs.filter(visited=False).exclude(visit_id__exact='')
+        return books
+
+    def create_book_tag(self, name):
+        """TODO: Check for book_tag similarity 85-90%"""
+        slug_name = slugify(name)
+        tag = BookTag.objects.filter(slug=slug_name).exists()
+        if not tag:
+            logging.info(f'-- Creating tag: {name}')
+            booktag = BookTag.objects.create(name=name)
+            return booktag
+        return False
+
+    def add_book_booktag(self, book, tag_name):
+        """Adds booktag to book if not exist"""
+        try:
+            booktag = BookTag.objects.get(slug=slugify(tag_name))
+            if booktag not in book.booktag.all():
+                logging.info(f'- Adding: {tag_name}')
+                book.booktag.add(booktag)
+                return True
+            return False
+        except (BookTag.DoesNotExist, Book.DoesNotExist) as e:
+            raise e

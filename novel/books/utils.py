@@ -9,17 +9,17 @@ from django.conf import settings
 from django.utils.text import slugify
 
 
-def download_img(url, file_name):
+def download_img(url, file_name, folder='posters'):
     url = f'https:{url}' if url[0:1] == '/' else url
     resp = requests.get(url)
     resp_type = resp.headers['content-type']
     if resp_type.partition('/')[0].strip() == 'image':
         file_ext = guess_extension(resp_type)
         file_ext = '.jpg' if file_ext == '.jpe' else file_ext
-        media_posters = os.path.join(settings.MEDIA_ROOT, 'posters')
-        f_path = os.path.join(media_posters, f'{file_name}{file_ext}')
-        if not os.path.exists(media_posters):
-            os.makedirs(media_posters)
+        file_path = os.path.join(settings.MEDIA_ROOT, folder)
+        f_path = os.path.join(file_path, f'{file_name}{file_ext}')
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
         with open(f_path, 'wb') as f:
             f.write(resp.content)
         return f'{file_name}{file_ext}'
@@ -53,7 +53,6 @@ def upload_to_s3(file_name, bucket_path='', object_name=None, public_read=False)
 
 def get_unique_slug(cls, name):
     """TODO: other unicode(ru) slugify"""
-
     slug = slugify(name)
     unique_slug = slug
     num = 1
@@ -64,13 +63,11 @@ def get_unique_slug(cls, name):
 
 
 def capitalize_str(string):
-    string = ' '.join([w.capitalize() for w in string.split(' ')])
-    return string
+    return ' '.join([w.capitalize() for w in string.split(' ')])
 
 
 def capitalize_slug(slug):
-    slug = re.sub(r'\d', '', ' '.join([w.capitalize() for w in slug.split('-')])).strip()
-    return slug
+    return re.sub(r'\d', '', ' '.join([w.capitalize() for w in slug.split('-')])).strip()
 
 
 def multiple_replace(to_repl, text):
@@ -89,6 +86,7 @@ def spoon_feed(qs, func, chunk=1000, start=0):
 
 
 def search_multiple_replace():
+    """TODO: Refactor this monstrosity"""
     from .models import BookChapter
     b_chaps = BookChapter.objects.order_by('pk')
     # to_repls = BookChapterReplace.objects.order_by('pk')

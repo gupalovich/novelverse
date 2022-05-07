@@ -91,3 +91,35 @@ class BookScraperTest(TestCase):
             self.assertTrue(len(data['c_title']) >= 4)
             self.assertTrue(len(data['c_content']) >= 500)
             self.assertTrue('panda-novel.com/content' in data['c_next'])
+
+    def test_panda_remove_watermarks(self):
+        examples = [
+            'Please come to p.a.n.d.a n.ovel',
+            'Please come to p a.n.d.a n.ovel',
+            'Please come to p,a.n.d.a n.ovel.com',
+            'Please come to p-a.n.d.a n.ovel',
+            'Update faster? please come to P.an.da N.o.vel',
+            'Update faster? please come to P.an.da No.vel',
+            'Update faster? please come to Pan.da N.o.vel',
+            'Update faster? please come to panda-novel.c.om',
+            'update faster perks? google search pan.da no.ve.l',
+            'update faster perks? google search pan.da no.vel',
+            'Do you want to read more chapters? Come to panda-novel,com',
+            'Come to panda-novel,com',
+            'Please visit panda-novel ,com',
+            'Please visit panda-novel ,com',
+            'Please visit panda-novel ,c.o.m',
+            'Want to see more chapters? Please visit pan da-novel ,c.o.m',
+            'If you want to read more chapters, visit pa nda-novel,c.o,m',
+            'Want to see more chapters? Please visit p a n d a -n o v e l .c o m',
+            'Do you want to read more chapters? Come to p a n d a - n ovel,c.o.m',
+            'Do you want to read more chapters? Come to p a n d a - n o v e l,c.o.m',
+            'Want to see more chapters? Please visit p a n d a -n o v e l .c o m',
+            'Please visit p a n d a - n o v e l ,c o m',
+        ]
+        for i, text in enumerate(examples):
+            result = self.scraper.panda_remove_watermarks(text)
+            if result:
+                examples[i] = result
+        for example in examples:
+            self.assertTrue(len(example) <= 5)

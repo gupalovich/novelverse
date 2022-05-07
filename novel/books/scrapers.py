@@ -170,8 +170,45 @@ class BookScraper:
                 continue
         return chaps
 
+    def panda_remove_watermarks(self, text: str) -> str:
+        """Search/remove pandanovel watermarks in paragraph"""
+        fillers = [
+            'Update faster? please come to',
+            'update faster perks? google search',
+            'Do you want to read more chapters?',
+            'Want to see more chapters?',
+            'If you want to read more chapters, visit',
+            'Remember to remove punctuation',
+            'Please come to', 'Come to', 'Please visit',
+            'update faster',
+        ]
+        patterns = [
+            # search patterns 'pandanovelcom'
+            r'p[\s]a[\s]n.+c[.,\s]o[.,\s]m',
+            r'pan.+c[.,\s]o[.,\s]m',
+            r'pa.+c[.,\s]o[.,\s]m',
+            r'p[.,]a.+com',
+            r'pa.+c[.,]om',
+            r'pa.+com',
+            # search patterns 'pandanovel'
+            r'pan.+vel',
+            r'p[.\-,\s]a.+vel',
+            r'pan.+v[.,\s]e[.,\s]l',
+            r'pa.+ve[.,\s]l',
+        ]
+        for filler in sorted(fillers, key=len, reverse=True):
+            text = text.replace(filler, '')
+        result = None
+        for pattern in patterns:
+            pattern = re.compile(pattern, re.IGNORECASE)
+            result = re.search(pattern, text)
+            if result:
+                result = text.replace(result.group(), '')
+                break
+        return result
+
     def panda_get_chap(self, chap_url: str) -> dict:
-        """TODO: Watermark removal"""
+        """Build/clean pandanovel chapter content"""
         chap_data = {}
         driver = webdriver.Chrome(options=self.driver_opts)
         driver.get(chap_url)
@@ -189,7 +226,7 @@ class BookScraper:
         chap_content_raw = self.sel_find_css(driver, '.novel-content div', many=True)
         chap_content = ''
         for p_raw in chap_content_raw:
-            parags = p_raw.text.split('\n')
+            parags = p_raw.text.split('\n')  # content split in </br>
             if not parags:
                 continue
             for pg in parags:
@@ -197,13 +234,18 @@ class BookScraper:
                 pg_letters = re.sub(r'[^a-zA-Z]+', '', pg.lower())
                 if not pg:
                     continue
-                if re.search(r"\[.*?\]", pg) or re.search(r"\*.*?\*", pg):  # between [ ] or * *
+                if 'pandanovel' in pg_letters:
+                    pg = self.panda_remove_watermarks(pg)
+                    pg_letters = re.sub(r'[^a-zA-Z]+', '', pg.lower())  # double check
+                    if 'pandanovel' in pg_letters:
+                        with open('chap_watermarks.txt', 'a', encoding='utf-8') as f:
+                            f.write(pg + '\n')
+
+                if re.search(r"\[.*?\]", pg) or re.search(r"\*.*?\*", pg):  # between [] and **
                     chap_content += f'<p><b>{pg}</b></p>'
-                elif 'pandanovel' in pg_letters:
-                    with open('chap_watermarks.txt', 'a', encoding='utf-8') as f:
-                        f.write(pg + '\n')
                 else:
                     chap_content += f'<p>{pg}</p>'
+
         chap_data.update({
             'c_id': chap_id,
             'c_title': chap_title,

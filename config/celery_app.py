@@ -5,9 +5,8 @@ from django.conf import settings
 from django.apps import apps, AppConfig
 
 
-if not settings.configured:
-    # set the default Django settings module for the 'celery' program.
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+# set the default Django settings module for the 'celery' program.
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
 app = Celery("novel")
 

@@ -2,7 +2,6 @@ import logging
 import time
 import sys
 import os
-import environ
 import django
 
 

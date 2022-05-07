@@ -1,4 +1,4 @@
-from novel.config.celery_app import app as celery_app
+# from novel.config.celery_app import app as celery_app
 
 
 def save_celery_result(*args, **kwargs):

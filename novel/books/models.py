@@ -152,7 +152,7 @@ class Book(TimeStampedModel):
 
 
 class BookChapter(TimeStampedModel):
-    """TODO: 'reports' field/model"""
+    """TODO: 'reports' field/model;"""
     book = models.ForeignKey(
         Book,
         on_delete=models.CASCADE,
@@ -166,6 +166,12 @@ class BookChapter(TimeStampedModel):
     text = models.TextField(blank=False, default='')
     thoughts = models.TextField(blank=True, default='')
     origin = models.CharField(choices=VISIT_CHOICES, blank=True, default='', max_length=55)
+    CATEGORY_CHOICES = Choices(
+        ('normal', 'Normal'),
+        ('info', 'Info'),
+        ('mtl', 'mtl')
+    )
+    category = models.CharField(choices=CATEGORY_CHOICES, blank=True, default=CATEGORY_CHOICES.normal, max_length=55)
 
     class Meta:
         verbose_name = _('Book Chapter')

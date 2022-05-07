@@ -23,7 +23,7 @@ class BookScraper:
             'pandanovel': 'https://www.panda-novel.com/',
         }
         self.driver_opts = webdriver.ChromeOptions()
-        # self.driver_opts.add_argument('headless')
+        self.driver_opts.add_argument('headless')
         self.driver_opts.add_argument('disable-gpu')
         self.driver_opts.add_argument('log-level=3')
         self.driver_opts.add_argument('lang=en-US')
@@ -171,7 +171,7 @@ class BookScraper:
         return chaps
 
     def panda_remove_watermarks(self, text: str) -> str:
-        """Search/remove pandanovel watermarks in paragraph"""
+        """Search/remove pandanovel watermarks"""
         fillers = [
             'Update faster? please come to',
             'update faster perks? google search',

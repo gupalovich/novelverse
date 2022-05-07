@@ -1,7 +1,7 @@
 from django.test import TestCase, tag
 
 from ..models import Book, BookGenre, BookChapter, BookChapterReplace
-from ..utils import *
+from ..utils import (capitalize_str, capitalize_slug, multiple_replace, spoon_feed)
 
 
 class UtilsTest(TestCase):

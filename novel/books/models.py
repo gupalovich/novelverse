@@ -171,7 +171,7 @@ class BookChapter(TimeStampedModel):
         ('info', 'Info'),
         ('mtl', 'mtl')
     )
-    category = models.CharField(choices=CATEGORY_CHOICES, blank=True, default=CATEGORY_CHOICES.normal, max_length=55)
+    category = models.CharField(choices=CATEGORY_CHOICES, blank=False, default=CATEGORY_CHOICES.normal, max_length=55)
 
     class Meta:
         verbose_name = _('Book Chapter')

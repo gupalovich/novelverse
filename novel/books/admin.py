@@ -144,6 +144,7 @@ class BookChapterAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
                 'book',
                 'title',
                 'slug',
+                'category',
                 'text',
                 'allow_comments',
             ),

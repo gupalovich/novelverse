@@ -1,15 +1,17 @@
 import traceback
+
 from celery import states
 from celery.exceptions import Ignore
 # from django.contrib.auth import get_user_model
 
-from novel.taskapp.celery import app, save_celery_result
+from config.celery_app import app as celery_app
+from novel.books.utils import save_celery_result
 from .models import Profile
 
 # User = get_user_model()
 
 
-@app.task(bind=True, ignore_result=True)
+@celery_app.task(bind=True, ignore_result=True)
 def update_users_votes(self):
     try:
         profiles = Profile.objects.all()

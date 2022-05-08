@@ -1,6 +1,6 @@
 import traceback
 
-from celery import Celery, Task, states
+from celery import states
 from celery.exceptions import Ignore
 from config.celery_app import app as celery_app
 

@@ -52,6 +52,9 @@ coverage.xml
 
 # Django stuff:
 staticfiles/
+django.bat
+django.dat
+django.dir
 
 # Sphinx documentation
 docs/_build/

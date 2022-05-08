@@ -2,15 +2,15 @@ import traceback
 
 from celery import states
 from celery.exceptions import Ignore
-from config.celery_app import app as celery_app
+from django_celery_beat.models import PeriodicTask
 
+from config.celery_app import app as celery_app
 from .utils import save_celery_result
 
 
 @celery_app.task(bind=True, ignore_result=True)
 def clean_oneoff_tasks(self):
     try:
-        from django_celery_beat.models import PeriodicTask
         PeriodicTask.objects.filter(one_off=True, enabled=False).delete()
     except Exception as exc:
         save_celery_result(

@@ -52,6 +52,23 @@ def upload_to_s3(file_name, bucket_path='', object_name=None, public_read=False)
     return True
 
 
+def save_celery_result(*args, **kwargs):
+    from django_celery_results.models import TaskResult
+    try:
+        TaskResult.objects.create(
+            task_id=kwargs.get('task_id', ''),
+            task_name=kwargs.get('task_name', ''),
+            status=kwargs.get('status', ''),
+            content_type=kwargs.get('content_type', 'application/json'),
+            content_encoding=kwargs.get('content_encoding', 'utf-8'),
+            result=kwargs.get('result', ''),
+            meta=kwargs.get('meta', ''),
+            traceback=kwargs.get('traceback', ''),
+        )
+    except Exception as e:
+        raise e
+
+
 def get_unique_slug(cls, name):
     """TODO: other unicode(ru) slugify"""
     slug = slugify(name)

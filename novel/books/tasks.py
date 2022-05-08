@@ -1,21 +1,10 @@
-# from novel.config.celery_app import app as celery_app
+import traceback
 
+from celery import Celery, Task, states
+from celery.exceptions import Ignore
+from config.celery_app import app as celery_app
 
-def save_celery_result(*args, **kwargs):
-    from django_celery_results.models import TaskResult
-    try:
-        TaskResult.objects.create(
-            task_id=kwargs.get('task_id', ''),
-            task_name=kwargs.get('task_name', ''),
-            status=kwargs.get('status', ''),
-            content_type=kwargs.get('content_type', 'application/json'),
-            content_encoding=kwargs.get('content_encoding', 'utf-8'),
-            result=kwargs.get('result', ''),
-            meta=kwargs.get('meta', ''),
-            traceback=kwargs.get('traceback', ''),
-        )
-    except Exception as e:
-        raise e
+from .utils import save_celery_result
 
 
 @celery_app.task(bind=True, ignore_result=True)

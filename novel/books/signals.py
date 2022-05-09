@@ -18,7 +18,7 @@ def scrape_book_info_task_signal(sender, instance, created=False, **kwargs):
         if instance.visited or not instance.visit_id:  # no scrape url suplied
             return None
         salt = uuid.uuid4().hex[:12]
-        schedule, _ = IntervalSchedule.objects.get_or_create(every=15, period=IntervalSchedule.SECONDS)
+        schedule, _ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.SECONDS)
         PeriodicTask.objects.create(
             name=f'Update book: {instance.title} : {salt} ',
             task='novel.books.tasks.scrape_book_info_task',

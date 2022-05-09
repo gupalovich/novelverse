@@ -58,9 +58,12 @@ class BookScraper:
         b_desc = ''.join([f'<p>{i}</p>' for i in b_desc_raw.split('\n') if i])
         b_tags = [tag.text.replace('# ', '').lower() for tag in r.html.find('p.m-tag')]
         try:
-            b_author = r.html.find('h2.ell.dib.vam span')[0].text
+            b_author = r.html.find('h2.ell.dib.vam a')[0].text
         except IndexError:
-            b_author = ''
+            try:
+                b_author = r.html.find('h2.ell.dib.vam span')[0].text
+            except IndexError:
+                b_author = ''
         b_rating = float(r.html.find('._score.ell strong')[0].text)
         b_poster_url = r.html.find('i.g_thumb img')[1].attrs['src']
         b_volumes = self.webnovel_get_book_volumes(book_url) if volumes else [1, ]

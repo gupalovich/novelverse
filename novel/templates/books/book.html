@@ -29,13 +29,13 @@
         </div>
         <div class="bookhead__info--row">
           <div class="info-row">
-            <p>Author: {% for author in book.author %}<span>{{author}}</span>{% endfor %}</p>
+            <p><b>Author:</b> {% for author in book.author %}<span>{{author}}</span>{% endfor %}</p>
             {% if book.country %}
-              <p>Country: {{book.country|title}}</p>
+              <p><b>Country:</b> {{book.country|title}}</p>
             {% endif %}
-            <p>Chapters: {{book.chapters_count}}</p>
+            <p><b>Chapters:</b> {{book.chapters_count}}</p>
             <!-- <p>Views: 0</p> -->
-            <p class="info-row--status">Status:
+            <p class="info-row--status"><b>Status:</b>
               {% if book.status_release == 0 %}
                 {% if book.chapters_release != 0 %}
                   <span class="c-grn">{{book.chapters_release}} chs / week</span>

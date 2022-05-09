@@ -145,6 +145,7 @@ def search_multiple_replace():
 
 class ModelUtils:
     def __init__(self):
+        """TODO: test all"""
         pass
 
     def filter_books_visit(self, qs, revisit=False):
@@ -174,7 +175,9 @@ class ModelUtils:
         return bookchapter
 
     def add_book_booktag(self, book, tag_name: str):
-        """Adds booktag to book if not exist"""
+        """Adds booktag to book if not exist
+           TODO: booktag similarity
+        """
         try:
             from .models import Book, BookTag
             booktag = BookTag.objects.get(slug=slugify(tag_name))
@@ -188,23 +191,19 @@ class ModelUtils:
 
     def update_book_data(self, book, data: dict):
         """Update book object with scraped data
-           TODO: chap_release"""
+           TODO: status_completeness"""
         print(f'- Updating book: {book}')
         book.title = data['book_title']
         book.title_sm = data['book_title_sm']
-        book.author.append(data['book_info_author']) if data['book_info_author'] not in book.author else False
+        book.author.append(data['book_author']) if data['book_author'] not in book.author else False
         book.description = data['book_description']
         if len(book.volumes) != len(data['book_volumes']):
             [book.volumes.append(volume) for volume in data['book_volumes']]
-        poster_filename = download_img(data['book_poster_url'], slugify(data['book_name']))
+        poster_filename = download_img(data['book_poster_url'], slugify(data['book_title']))
         book.poster = f'posters/{poster_filename}'
         book.rating = data['book_rating']
-        # if data['chap_release'] == 'completed':
-        #     book.status_release = 1
-        # elif isinstance(data['chap_release'], int):
-        #     book.chapters_release = data['chap_release']
-        # for tag in data['book_tags']:
-        #     self.create_book_tag(tag)
-        #     self.add_book_booktag(book, tag)
+        for tag in data['book_tags']:
+            self.create_book_tag(tag)
+            self.add_book_booktag(book, tag)
         book.visited = True
-        # book.save()  # prevent celery post_save closure
+        book.status = 1

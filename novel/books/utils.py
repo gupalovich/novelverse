@@ -97,6 +97,7 @@ def multiple_replace(to_repl, text):
 
 
 def spoon_feed(qs, func, chunk=1000, start=0):
+    """Split qs in chunks and do the `func` thing to them"""
     while start < qs.order_by('pk').last().pk:
         for o in qs.filter(pk__gt=start, pk__lte=start + chunk):
             yield func(o)
@@ -113,39 +114,10 @@ def handle_error(error, to_file=True):
         pass
 
 
-def search_multiple_replace():
-    """TODO: Refactor this monstrosity"""
-    b_chaps = BookChapter.objects.order_by('pk')
-    # to_repls = BookChapterReplace.objects.order_by('pk')
-    result = []
-    for b_chap in b_chaps.iterator(chunk_size=1000):
-        if '<br>' in b_chap.text:
-            b_chap_text = b_chap.text.split('<p>')
-            new_text = []
-            for text_node in b_chap_text:
-                text_node = text_node.replace('<p>', '').replace('</p>', '')
-                brs = text_node.split('<br>')
-                [new_text.append(f'<p>{br}</p>') if br else '' for br in brs]
-            b_chap.text = ''.join(new_text)
-            b_chap.save(update_fields=['text'])
-            result.append(f'{b_chap.book} - {b_chap.title}\n')
-    # for b_chap in b_chaps:
-    #     b_chap_text = re.sub('[^a-zA-Z]+', '', b_chap.text.lower())
-    #     for k, v in to_repl.items():
-    #         if k in b_chap_text:
-    #             if 'boxnovel' in k:
-    #                 rx_repl = r'.{0,1}\s{0,2}'.join(k)
-    #             else:
-    #                 rx_repl = k
-    #             b_chap.text = re.sub(rx_repl, v, b_chap.text, flags=re.I)
-    #             b_chap.save()
-
-    return result
-
-
 class ModelUtils:
     def __init__(self):
-        """TODO: test all"""
+        """Import as model_utils
+           TODO: test all"""
         pass
 
     def filter_books_visit(self, qs, revisit=False):

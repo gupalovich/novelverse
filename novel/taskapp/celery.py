@@ -45,5 +45,3 @@ class RequestBaseTask(Task):
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         # do something
         pass
-
-

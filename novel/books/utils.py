@@ -1,6 +1,7 @@
 import os
 import re
 import requests
+import traceback
 import logging
 
 from mimetypes import guess_extension
@@ -101,6 +102,15 @@ def spoon_feed(qs, func, chunk=1000, start=0):
             yield func(o)
         start += chunk
         # gc.collect()
+
+
+def handle_error(error, to_file=True):
+    """TODO: add alternative to to_file(save it to task_results or smh else)"""
+    if to_file:
+        with open('error_log.txt', 'a', encoding='utf-8') as f:
+            f.write(traceback.format_exc(error) + '\n\n')
+    else:
+        pass
 
 
 def search_multiple_replace():

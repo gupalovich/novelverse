@@ -11,11 +11,6 @@ from .scrapers import BookScraper
 
 
 @app.task(bind=True)
-def rescrap_book_chaps(self, book_id, s_from=0):
-    pass
-
-
-@app.task(bind=True)
 def b_chap_search_multiple_replace(self):
     try:
         print('Starting search_multiple_replace')

@@ -106,6 +106,7 @@ class BookScraperTest(TestCase):
             'update faster perks? google search pan.da no.vel',
             'Do you want to read more chapters? Come to panda-novel,com',
             'Come to panda-novel,com',
+            'Panda Novel',
             'Please visit panda-novel ,com',
             'Please visit panda-novel ,com',
             'Please visit panda-novel ,c.o.m',

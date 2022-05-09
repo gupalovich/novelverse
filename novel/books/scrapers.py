@@ -194,6 +194,7 @@ class BookScraper:
             r'pa.+c[.,]om',
             r'pa.+com',
             # search patterns 'pandanovel'
+            r'pa.+el',
             r'pan.+vel',
             r'p[.\-,\s]a.+vel',
             r'pan.+v[.,\s]e[.,\s]l',
@@ -203,10 +204,9 @@ class BookScraper:
             text = text.replace(filler, '')
         result = None
         for pattern in patterns:
-            pattern = re.compile(pattern, re.IGNORECASE)
-            result = re.search(pattern, text)
+            result = re.search(pattern, text, re.I)
             if result:
-                result = text.replace(result.group(), '')
+                result = text.replace(result.group(), ' ')
                 break
         return result
 

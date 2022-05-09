@@ -175,9 +175,7 @@ class ModelUtils:
         return bookchapter
 
     def add_book_booktag(self, book, tag_name: str):
-        """Adds booktag to book if not exist
-           TODO: booktag similarity
-        """
+        """Adds booktag to book if not exist"""
         try:
             from .models import Book, BookTag
             booktag = BookTag.objects.get(slug=slugify(tag_name))
@@ -189,9 +187,8 @@ class ModelUtils:
         except (BookTag.DoesNotExist, Book.DoesNotExist) as e:
             raise e
 
-    def update_book_data(self, book, data: dict):
-        """Update book object with scraped data
-           TODO: status_completeness"""
+    def update_book_data(self, book, data: dict, save=False):
+        """Update book object with scraped data"""
         print(f'- Updating book: {book}')
         book.title = data['book_title']
         book.title_sm = data['book_title_sm']
@@ -207,3 +204,8 @@ class ModelUtils:
             self.add_book_booktag(book, tag)
         book.visited = True
         book.status = 1
+        if save:
+            book.save()
+
+
+model_utils = ModelUtils()

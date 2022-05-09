@@ -65,5 +65,5 @@ def scrape_book_info_task(self, book_id):
 
 
 @celery_app.task(bind=True, ignore_result=True)
-def scrape_book_chapters_task(self, book_id):
+def scrape_initial_book_chapters_task(self, book_id):
     pass

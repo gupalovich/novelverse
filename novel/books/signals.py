@@ -13,12 +13,12 @@ from .utils import handle_error
 
 @receiver(post_save, sender=Book)
 def scrape_book_info_task_signal(sender, instance, created=False, **kwargs):
-    """Update book info if not book.visited and book.visit_id; """
+    """Create task to update book info if not book.visited and book.visit_id; """
     try:
         if instance.visited or not instance.visit_id:  # no scrape url suplied
             return None
         salt = uuid.uuid4().hex[:12]
-        schedule, _ = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.SECONDS)
+        schedule, _ = IntervalSchedule.objects.get_or_create(every=10, period=IntervalSchedule.SECONDS)
         PeriodicTask.objects.create(
             name=f'Update book: {instance.title} : {salt} ',
             task='novel.books.tasks.scrape_book_info_task',
@@ -27,41 +27,28 @@ def scrape_book_info_task_signal(sender, instance, created=False, **kwargs):
             one_off=True,
             args=json.dumps([instance.pk]),
         )
-        if not instance.chapters_count:
-            pass
     except Exception as e:
         handle_error(e)
 
 
-# @receiver(post_save, sender=Book)
-def book_scraper_initial_signal(sender, instance, created=False, **kwargs):
-    """TODO: Error handling"""
-    if not instance.visited and instance.visit_id:
-        salt = uuid.uuid4().hex[:10]
-        schedule, created = IntervalSchedule.objects.get_or_create(
-            every=15,
-            period=IntervalSchedule.SECONDS,
-        )
+@receiver(post_save, sender=Book)
+def scrape_initial_book_chapters_signal(sender, instance, created=False, **kwargs):
+    """Create task to scrape book_chapters if not book.chapters_count"""
+    try:
+        if instance.chapters_count:
+            return None
+        salt = uuid.uuid4().hex[:12]
+        schedule, _ = IntervalSchedule.objects.get_or_create(every=30, period=IntervalSchedule.SECONDS)
         PeriodicTask.objects.create(
-            one_off=True,
+            name=f'Update book chapters: {instance.title} : {salt} ',
+            task='novel.books.tasks.scrape_initial_book_chapters_task',
             interval=schedule,
-            name=f'Update book: {instance.title}',
-            task='novel.books.tasks.book_scraper_info',
+            enabled=True,
+            one_off=True,
             args=json.dumps([instance.pk]),
         )
-
-        if not instance.chapters_count:
-            schedule, created = IntervalSchedule.objects.get_or_create(
-                every=50,
-                period=IntervalSchedule.SECONDS,
-            )
-            PeriodicTask.objects.create(
-                one_off=True,
-                interval=schedule,
-                name=f'Update book chapters init: {instance.title}',
-                task='novel.books.tasks.book_scraper_chaps',
-                args=json.dumps([instance.pk]),
-            )
+    except Exception as e:
+        handle_error(e)
 
 
 @receiver(post_save, sender=BookChapter)

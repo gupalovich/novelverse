@@ -44,7 +44,10 @@ def upload_to_s3(file_name, bucket_path='', object_name=None, public_read=False)
 
     try:
         if public_read:
-            s3_client.upload_file(f'{file_name}', bucket, f'{bucket_path}/{object_name}', ExtraArgs={'ACL': 'public-read'})
+            s3_client.upload_file(
+                f'{file_name}', bucket,
+                f'{bucket_path}/{object_name}',
+                ExtraArgs={'ACL': 'public-read'})
         else:
             s3_client.upload_file(f'{file_name}', bucket, f'{bucket_path}/{object_name}')
     except ClientError as e:

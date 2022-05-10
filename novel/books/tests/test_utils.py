@@ -4,7 +4,7 @@ import re
 from django.test import TestCase
 from django.db.models import signals
 
-from ..models import Book, BookTag, BookGenre, BookChapter
+from ..models import Book, BookTag, BookGenre
 from ..utils import (
     capitalize_str,
     capitalize_slug,

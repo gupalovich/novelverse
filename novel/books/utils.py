@@ -105,13 +105,13 @@ def spoon_feed(qs, func, chunk=1000, start=0):
         # gc.collect()
 
 
-def handle_error(error, to_file=True):
+def handle_error(error, to_file=False):
     """TODO: add alternative to to_file(save it to task_results or smh else)"""
     if to_file:
         with open('error_log.txt', 'a', encoding='utf-8') as f:
-            f.write(traceback.format_exc(error) + '\n\n')
+            f.write(traceback.format_exc(error) + '\n')
     else:
-        pass
+        raise error
 
 
 """Model utils from here"""
@@ -144,8 +144,13 @@ def create_book_chapter(book, c_id, title, text, thoughts='', origin='', log=Fal
     if log:
         logging.info(f'- Creating book_chapter: {title}')
     from .models import BookChapter
-    bookchapter = BookChapter.objects.create(
-        book=book, c_id=c_id, title=title, text=text, thoughts=thoughts, origin=origin)
+    if c_id == 'info' or c_id == 'mtl':
+        bookchapter = BookChapter.objects.create(
+            book=book, c_id=0, title=title, text=text,
+            thoughts=thoughts, origin=origin, category=c_id)
+    else:
+        bookchapter = BookChapter.objects.create(
+            book=book, c_id=c_id, title=title, text=text, thoughts=thoughts, origin=origin)
     return bookchapter
 
 
@@ -162,9 +167,10 @@ def add_book_booktag(book, tag_name: str, log=False):
         raise e
 
 
-def update_book_data(book, data: dict, save=False, test=False):
+def update_book_data(book, data: dict, save=False, log=False):
     """Update book object with scraped data"""
-    print(f'- Updating book: {book}')
+    if log:
+        logging.info(f'- Updating book: {book}')
     book.title = data['book_title']
     book.title_sm = data['book_title_sm']
     book.author.append(data['book_author']) if data['book_author'] not in book.author else False

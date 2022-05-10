@@ -82,8 +82,14 @@ class UtilsTest(TestCase):
     def test_create_book_chapter(self):
         book = Book.objects.first()
         self.assertTrue(book.chapters_count == 0)
-        create_book_chapter(book, '2', 'Test title', 'Test text')
+        bookchapter = create_book_chapter(book, '2', 'Test title', 'Test text')
         self.assertTrue(book.chapters_count == 1)
+        self.assertTrue(bookchapter.c_id == 1)
+        self.assertTrue(bookchapter.category == 'normal')
+        bookchapter = create_book_chapter(book, 'info', 'Test title', 'Test text')
+        self.assertTrue(book.chapters_count == 2)
+        self.assertTrue(bookchapter.c_id == 2)
+        self.assertTrue(bookchapter.category == 'info')
 
     def test_add_book_booktag(self):
         tag_name = 'Test tag'

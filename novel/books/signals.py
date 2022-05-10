@@ -53,8 +53,7 @@ def scrape_initial_book_chapters_signal(sender, instance, created=False, **kwarg
 
 @receiver(post_save, sender=BookChapter)
 def create_update_chapter_cid(sender, instance, created=False, **kwargs):
-    """If new bookchapter created - update book.chapters_count and update bookchapter c_id"""
-    """TODO: we get c_id from scraper + fix type-info chapter"""
+    """post_save update book.chapters_count and bookchapter.c_id"""
     try:
         if created:
             instance.book.update_chapters_count()

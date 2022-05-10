@@ -169,7 +169,7 @@ class BookChapter(TimeStampedModel):
     CATEGORY_CHOICES = Choices(
         ('normal', 'Normal'),
         ('info', 'Info'),
-        ('mtl', 'mtl')
+        ('mtl', 'MTL')
     )
     category = models.CharField(choices=CATEGORY_CHOICES, blank=False, default=CATEGORY_CHOICES.normal, max_length=55)
 

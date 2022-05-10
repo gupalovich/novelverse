@@ -1,9 +1,11 @@
 import traceback
 import logging
+import json
+import uuid
 
 from celery import states
 from celery.exceptions import Ignore
-from django_celery_beat.models import PeriodicTask
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 from config.celery_app import app as celery_app
 from .models import Book
@@ -96,9 +98,25 @@ def scrape_initial_book_chapters_task(self, book_id):
 
 
 @celery_app.task(bind=True)
-def scrape_book_revisit_task(self, book_id):
+def scrape_book_chapters_revisit_task(self, book_id):
     try:
-        pass
+        book = Book.objects.get(pk=book_id)
+        book_scraper = BookScraper()
+        if not book.revisit_id:
+            return None
+        if book.revisit == 'webnovel':
+            pass
+        elif book.revisit == 'pandanovel':
+            book_chap_url = book.revisit_id
+            while True:
+                data = book_scraper.panda_get_chap(book_chap_url)
+                create_book_chapter(
+                    book, data['c_id'], data['c_title'], data['c_content'],
+                    origin=data['c_origin'], log=True)
+                if data['c_next']:
+                    book_chap_url = data['c_next']
+                else:
+                    break
     except Exception as e:
         save_celery_result(
             task_id=self.request.id,
@@ -112,9 +130,42 @@ def scrape_book_revisit_task(self, book_id):
 
 @celery_app.task(bind=True, ignore_result=True)
 def update_book_revisited_task(self):
+    """Update revisited field on books with status=0(ongoing)"""
     try:
         books = Book.objects.filter(status_release=0)  # ongoing novels
         books.update(revisited=False)
+    except Exception as e:
+        save_celery_result(
+            task_id=self.request.id,
+            task_name=self.name,
+            status=states.FAILURE,
+            result=e,
+            traceback=traceback.format_exc(),
+        )
+        raise Ignore()
+
+
+@celery_app.task(bind=True, ignore_result=True)
+def add_book_revisit_tasks(self):
+    """Filter books with revisited=False/revisit_id=True; Add task to revisit"""
+    try:
+        books = Book.objects.filter(revisited=False).exclude(revisit_id__iexact='')
+        schedule, _ = IntervalSchedule.objects.get_or_create(
+            every=15, period=IntervalSchedule.SECONDS)
+        for book in books:
+            if not book.chapters_count or not book.visited:
+                continue
+            salt = uuid.uuid4().hex[:12]
+            book.revisited = True
+            book.save()
+            PeriodicTask.objects.create(
+                name=f'Revisit book chapters: {book.title} : {salt} ',
+                task='novel.books.tasks.scrape_book_chapters_revisit_task',
+                interval=schedule,
+                enabled=True,
+                one_off=True,
+                args=json.dumps([book.pk]),
+            )
     except Exception as e:
         save_celery_result(
             task_id=self.request.id,

@@ -121,6 +121,8 @@ def scrape_book_chapters_revisit_task(self, book_id):
                 if data['c_next']:
                     book_chap_url = data['c_next']
                 else:
+                    book.revisited = True
+                    book.save(update_fields=['revisited'])
                     break
     except Exception as e:
         save_celery_result(

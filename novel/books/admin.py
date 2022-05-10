@@ -99,7 +99,7 @@ class BookAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
             'fields': ((('title', 'title_sm', 'slug')), ),
         }),
         (None, {
-            'fields': (('status', 'status_release'), ),
+            'fields': (('status', 'status_release', 'view_count'), ),
         }),
         (None, {
             'fields': ('bookgenre', 'booktag', ),
@@ -145,7 +145,9 @@ class BookChapterAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
                 'title',
                 'slug',
                 'category',
+                'origin',
                 'text',
+                'thoughts',
                 'allow_comments',
             ),
         }),
@@ -153,10 +155,10 @@ class BookChapterAdmin(SummernoteModelAdminMixin, admin.ModelAdmin):
             'fields': ('created', 'modified'),
         }),
     )
-    summernote_fields = ('text', )
+    summernote_fields = ('text', 'thoughts', )
     readonly_fields = ('slug', 'c_id', 'created', 'modified')
     list_select_related = ('book', )
-    list_display = ('title', 'c_id', 'get_book', 'get_book_visit_id', 'get_book_revisit_id', 'created', 'modified', )
+    list_display = ('title', 'c_id', 'get_book', 'origin', 'get_book_visit_id', 'get_book_revisit_id', 'created', 'modified', )
 
     def get_book(self, obj):
         return obj.book.title

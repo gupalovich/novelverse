@@ -69,6 +69,8 @@ def scrape_initial_book_chapters_task(self, book_id):
     """Get book chap_ids - Create chapters until lock reached"""
     try:
         book = Book.objects.get(pk=book_id)
+        if book.chapters_count:
+            return None
         book_scraper = BookScraper()
         book_url = book_scraper.urls[book.visit] + book.visit_id
         if book.visit == 'webnovel':
@@ -77,7 +79,7 @@ def scrape_initial_book_chapters_task(self, book_id):
                 book_chap_url = f'{book_url}/{chap_id}'
                 data = book_scraper.webnovel_get_chap(book_chap_url)
                 if not data:
-                    logging.info(f'Chapter Lock reached at: {i}')
+                    logging.info(f'- Chapters Lock reached at: {i}')
                     break
                 create_book_chapter(
                     book, data['c_id'], data['c_title'], data['c_content'],

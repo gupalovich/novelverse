@@ -35,7 +35,7 @@ def scrape_book_info_task_signal(sender, instance, created=False, **kwargs):
 def scrape_initial_book_chapters_signal(sender, instance, created=False, **kwargs):
     """Create task to scrape book_chapters if not book.chapters_count"""
     try:
-        if instance.chapters_count:
+        if instance.chapters_count or not instance.visit_id:
             return None
         salt = uuid.uuid4().hex[:12]
         schedule, _ = IntervalSchedule.objects.get_or_create(every=30, period=IntervalSchedule.SECONDS)
@@ -54,6 +54,7 @@ def scrape_initial_book_chapters_signal(sender, instance, created=False, **kwarg
 @receiver(post_save, sender=BookChapter)
 def create_update_chapter_cid(sender, instance, created=False, **kwargs):
     """If new bookchapter created - update book.chapters_count and update bookchapter c_id"""
+    """TODO: we get c_id from scraper + fix type-info chapter"""
     try:
         if created:
             instance.book.update_chapters_count()

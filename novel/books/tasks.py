@@ -7,7 +7,7 @@ from django_celery_beat.models import PeriodicTask
 from config.celery_app import app as celery_app
 from .models import Book
 from .scrapers import BookScraper
-from .utils import save_celery_result, model_utils
+from .utils import save_celery_result, update_book_data
 
 
 @celery_app.task(bind=True, ignore_result=True)
@@ -51,7 +51,7 @@ def scrape_book_info_task(self, book_id):
         if book.visit == 'webnovel':
             book_url = book_scraper.urls[book.visit] + book.visit_id
             book_data = book_scraper.webnovel_get_book_data(book_url)
-            model_utils.update_book_data(book, book_data)
+            update_book_data(book, book_data)
         book.save()
     except Exception as e:
         save_celery_result(

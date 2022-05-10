@@ -125,12 +125,10 @@ class BookScraper:
             self.sel_find_css(driver, '.cha-content._lock')
         except NoSuchElementException:
             chap_title_raw = self.sel_find_css(driver, '.cha-tit h1').text
+            chap_title = self.slice_bookchapter_title(chap_title_raw)
             try:
-                chap_title = re.split(
-                    r':|-|–', chap_title_raw, maxsplit=1)[1].strip().replace('‽', '?!')
                 chap_id = int(re.findall(r'\d+', chap_title_raw)[0])
             except IndexError:
-                chap_title = chap_title_raw
                 chap_id = 'info'
             chap_content_raw = self.sel_find_css(driver, '.cha-paragraph p', many=True)
             chap_content = ''.join([f'<p>{p.text}</p>' for p in chap_content_raw if p.text])
@@ -221,13 +219,7 @@ class BookScraper:
         driver.get(chap_url)
         self.sel_wait_until(driver, '.novel-content')
         chap_title_raw = self.sel_find_css(driver, '.novel-content h2').text
-        try:
-            chap_title = re.split(
-                r':|-|–', chap_title_raw, maxsplit=1)[1]
-        except IndexError:
-            """TODO: str w/o number will break normal order"""
-            chap_title = re.split(r'\s+', chap_title_raw, maxsplit=1)[1]
-        chap_title = chap_title.strip().replace('‽', '?!')
+        chap_title = self.slice_bookchapter_title(chap_title_raw)
         chap_id = int(re.findall(r'\d+', chap_title_raw)[0])
         chap_next = self.sel_find_css(driver, 'a.btn-next').get_attribute('href')
         chap_content_raw = self.sel_find_css(driver, '.novel-content div', many=True)
@@ -263,21 +255,22 @@ class BookScraper:
         return chap_data
 
     def slice_bookchapter_title(self, title):
-        return title
-
-    def run(self):
-        from pprint import pprint
-        url = 'https://www.panda-novel.com/content/the-oracle-paths(JN)-162-165078/chapter-1-the-day-everything-changed'
-        while True:
-            try:
-                data = self.panda_get_chap(url)
-                url = data['c_next']
-                print(data['c_id'], data['c_title'])
-                if not url:
-                    print('Stopped at:', data['c_id'])
-                    break
-            except Exception as e:
-                print(e)
+        patterns = [
+            r'chapter.*\d+[:.\s].*\d+[.:]',
+            r'chapter.*\d+[:.\s]',
+            r'^\d+[:.\s]',
+            r'^\d+.*[-]',
+        ]
+        for pattern in patterns:
+            pattern = re.compile(pattern, re.IGNORECASE)
+            match = re.match(pattern, title)
+            if match:
+                title = re.split(pattern, title, maxsplit=1)
+                title = title[1] if len(title) == 2 else title[0]
+                break
+        if title.startswith('-') or title.startswith(':'):
+            title = title[1:]
+        return title.strip()
 
 
 if __name__ == '__main__':

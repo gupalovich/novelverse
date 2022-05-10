@@ -134,11 +134,11 @@ class BookScraperTest(TestCase):
             'Chapter 736 - Testing the Dragon Form',
             'Chapter 736 : Testing the Dragon Form',
             '736 - Testing the Dragon Form',
-            '736: Testing the Dragon Form',
+            '7: Testing the Dragon Form',
             '736. Testing the Dragon Form',
             '736 Testing the Dragon Form',
             'Testing the Dragon Form',
         ]
         for i, example in enumerate(examples):
             examples[i] = self.scraper.slice_bookchapter_title(example)
-        print(examples)
+            self.assertTrue(examples[i] == 'Testing the Dragon Form')

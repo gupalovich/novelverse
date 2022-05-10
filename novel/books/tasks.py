@@ -102,17 +102,22 @@ def scrape_book_chapters_revisit_task(self, book_id):
     try:
         book = Book.objects.get(pk=book_id)
         book_scraper = BookScraper()
-        if not book.revisit_id:
+        if not book.revisit_id or book.revisited:
             return None
         if book.revisit == 'webnovel':
             pass
         elif book.revisit == 'pandanovel':
-            book_chap_url = book.revisit_id
+            """We get c_next from previously used chapter or none"""
+            book_chap_url = book_scraper.panda_get_chap(book.revisit_id)['c_next']
+            if not book_chap_url:
+                return None
             while True:
                 data = book_scraper.panda_get_chap(book_chap_url)
                 create_book_chapter(
                     book, data['c_id'], data['c_title'], data['c_content'],
                     origin=data['c_origin'], log=True)
+                book.revisit_id = book_chap_url
+                book.save(update_fields=['revisit_id'])
                 if data['c_next']:
                     book_chap_url = data['c_next']
                 else:

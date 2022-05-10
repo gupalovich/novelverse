@@ -6,6 +6,7 @@ import uuid
 from celery import states
 from celery.exceptions import Ignore
 from django_celery_beat.models import PeriodicTask, IntervalSchedule
+from selenium.common.exceptions import StaleElementReferenceException
 
 from config.celery_app import app as celery_app
 from .models import Book
@@ -111,14 +112,22 @@ def scrape_book_chapters_revisit_task(self, book_id):
             book_chap_url = book_scraper.panda_get_chap(book.revisit_id)['c_next']
             if not book_chap_url:
                 return None
+            stale_i = 0
             while True:
-                data = book_scraper.panda_get_chap(book_chap_url)
+                try:
+                    data = book_scraper.panda_get_chap(book_chap_url)
+                except StaleElementReferenceException:
+                    if stale_i >= 4:  # 4 attempts to get chapter
+                        break
+                    stale_i += 1
+                    continue
                 create_book_chapter(
                     book, data['c_id'], data['c_title'], data['c_content'],
                     origin=data['c_origin'], log=True)
                 book.revisit_id = book_chap_url
                 book.save(update_fields=['revisit_id'])
                 if data['c_next']:
+                    stale_i = 0
                     book_chap_url = data['c_next']
                 else:
                     book.revisited = True

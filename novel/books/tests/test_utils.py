@@ -108,7 +108,7 @@ class UtilsTest(TestCase):
         book_url = 'https://www.webnovel.com/book/blood-warlock-succubus-partner-in-the-apocalypse_20134751006091605'
         book_data = book_scraper.webnovel_get_book_data(book_url, volumes=False)
         book = Book.objects.first()
-        update_book_data(book, book_data, save=True)
+        update_book_data(book, book_data)
         book = Book.objects.first()
         self.assertTrue('blood warlock' in book.title.lower())
         self.assertTrue(book.author)

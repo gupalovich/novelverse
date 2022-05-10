@@ -1,12 +1,14 @@
 import os
 import re
 import requests
+import factory
 import traceback
 import logging
 
 from mimetypes import guess_extension
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
+from django.db.models import signals
 from django.utils.text import slugify
 
 
@@ -170,7 +172,8 @@ def add_book_booktag(book, tag_name: str, log=False):
         raise e
 
 
-def update_book_data(book, data: dict, save=False, log=False):
+@factory.django.mute_signals(signals.post_save)
+def update_book_data(book, data: dict, log=False):
     """Update book object with scraped data"""
     if log:
         logging.info(f'- Updating book: {book}')
@@ -188,5 +191,4 @@ def update_book_data(book, data: dict, save=False, log=False):
         add_book_booktag(book, tag)
     book.visited = True
     book.status = 1
-    if save:
-        book.save()
+    book.save()

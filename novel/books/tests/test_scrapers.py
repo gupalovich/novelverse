@@ -124,3 +124,21 @@ class BookScraperTest(TestCase):
                 examples[i] = result
         for example in examples:
             self.assertTrue(len(example) <= 5)
+
+    def test_slice_bookchapter_title(self):
+        examples = [
+            'Chapter 1: Testing the Dragon Form',
+            'Chapter 29: 29. Testing the Dragon Form',
+            'Chapter 842: Chapter 836: Testing the Dragon Form',
+            'Chapter 41 Testing the Dragon Form',
+            'Chapter 736 - Testing the Dragon Form',
+            'Chapter 736 : Testing the Dragon Form',
+            '736 - Testing the Dragon Form',
+            '736: Testing the Dragon Form',
+            '736. Testing the Dragon Form',
+            '736 Testing the Dragon Form',
+            'Testing the Dragon Form',
+        ]
+        for i, example in enumerate(examples):
+            examples[i] = self.scraper.slice_bookchapter_title(example)
+        print(examples)

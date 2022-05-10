@@ -11,24 +11,6 @@ from .scrapers import BookScraper
 
 
 @app.task(bind=True)
-def b_chap_search_multiple_replace(self):
-    try:
-        print('Starting search_multiple_replace')
-        result = search_multiple_replace()
-        print('Done search_multiple_replace')
-        return result
-    except Exception as exc:
-        save_celery_result(
-            task_id=self.request.id,
-            task_name=self.name,
-            status=states.FAILURE,
-            result=exc,
-            traceback=traceback.format_exc(),
-        )
-        raise Ignore()
-
-
-@app.task(bind=True)
 def update_bookchapter_title_slug(self):
     try:
         b_chaps = BookChapter.objects.order_by('pk')
@@ -53,70 +35,6 @@ def update_bookchapter_title_slug(self):
             result='\n'.join([f'BookChapter: {b_chap.c_id} {b_chap.title}', exc]),
             traceback=traceback.format_exc(),
         )
-        raise Ignore()
-
-
-@app.task(bind=True, ignore_result=True)
-def update_book_ranking(self):
-    try:
-        books = Book.objects.published().order_by('-votes')
-        for i, book in enumerate(books, start=1):
-            book.ranking = i
-            book.save(update_fields=['ranking'])
-    except Exception as exc:
-        save_celery_result(
-            task_id=self.request.id,
-            task_name=self.name,
-            status=states.FAILURE,
-            result=exc,
-            traceback=traceback.format_exc(),
-        )
-        raise Ignore()
-
-
-@app.task(bind=True, ignore_result=True)
-def update_book_revisited(self):
-    try:
-        books = Book.objects.filter(status_release=0)
-        books.update(revisited=False)
-    except Exception as exc:
-        save_celery_result(
-            task_id=self.request.id,
-            task_name=self.name,
-            status=states.FAILURE,
-            result=exc,
-            traceback=traceback.format_exc(),
-        )
-        raise Ignore()
-
-
-@app.task(bind=True, ignore_result=True)
-def book_scraper_info(self, book_id):
-    """
-        When new novel created - task initialised
-    """
-    book = Book.objects.get(pk=book_id)
-    if not book.visited and book.visit_id:
-        try:
-            scraper = BookScraper()
-            url_bb = scraper.url_bb[book.visit]
-            book_url = f'{url_bb}{book.visit_id}'
-            if book.visit == 'webnovel':
-                book_data = scraper.wn_get_book_data(book_url)
-                scraper.update_db_book_data(book, book_data)
-            book.visited = True
-            book.status = 1
-            book.save()
-        except Exception as exc:
-            save_celery_result(
-                task_id=self.request.id,
-                task_name=self.name,
-                status=states.FAILURE,
-                result='\n'.join([f'Book: {book.title}', str(exc)]),
-                traceback=traceback.format_exc(),
-            )
-            raise Ignore()
-    else:
         raise Ignore()
 
 

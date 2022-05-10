@@ -93,3 +93,52 @@ def scrape_initial_book_chapters_task(self, book_id):
             traceback=traceback.format_exc(),
         )
         raise Ignore()
+
+
+@celery_app.task(bind=True)
+def scrape_book_revisit_task(self, book_id):
+    try:
+        pass
+    except Exception as e:
+        save_celery_result(
+            task_id=self.request.id,
+            task_name=self.name,
+            status=states.FAILURE,
+            result=e,
+            traceback=traceback.format_exc(),
+        )
+        raise Ignore()
+
+
+@celery_app.task(bind=True, ignore_result=True)
+def update_book_revisited_task(self):
+    try:
+        books = Book.objects.filter(status_release=0)  # ongoing novels
+        books.update(revisited=False)
+    except Exception as e:
+        save_celery_result(
+            task_id=self.request.id,
+            task_name=self.name,
+            status=states.FAILURE,
+            result=e,
+            traceback=traceback.format_exc(),
+        )
+        raise Ignore()
+
+
+@celery_app.task(bind=True, ignore_result=True)
+def update_book_ranking_task(self):
+    try:
+        books = Book.objects.published().order_by('-votes')
+        for i, book in enumerate(books, start=1):
+            book.ranking = i
+            book.save(update_fields=['ranking'])
+    except Exception as e:
+        save_celery_result(
+            task_id=self.request.id,
+            task_name=self.name,
+            status=states.FAILURE,
+            result=e,
+            traceback=traceback.format_exc(),
+        )
+        raise Ignore()

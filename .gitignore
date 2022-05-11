@@ -55,6 +55,7 @@ staticfiles/
 django.bat
 django.dat
 django.dir
+chap_watermarks.txt
 
 # Sphinx documentation
 docs/_build/

@@ -137,6 +137,8 @@ def scrape_book_chapters_revisit_task(self, book_id):
                     book.revisited = True
                     book.save(update_fields=['revisited'])
                     break
+    except StaleElementReferenceException:
+        raise Ignore()
     except Exception as e:
         save_celery_result(
             task_id=self.request.id,

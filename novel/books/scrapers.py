@@ -219,7 +219,7 @@ class BookScraper:
         driver.get(chap_url)
         self.sel_wait_until(driver, '.novel-content')
         chap_title_raw = self.sel_find_css(driver, '.novel-content h2').text
-        chap_title = self.slice_bookchapter_title(chap_title_raw)
+        chap_title = self.slice_bookchapter_title(chap_title_raw).replace('&amp;', '&')
         chap_id = int(re.findall(r'\d+', chap_title_raw)[0])
         chap_next = self.sel_find_css(driver, 'a.btn-next').get_attribute('href')
         chap_content_raw = self.sel_find_css(driver, '.novel-content div', many=True)

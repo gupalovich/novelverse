@@ -206,6 +206,31 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
+
+# COMMENTS
+# ------------------------------------------------------------------------------
+COMMENTS_APP = 'django_comments_xtd'
+COMMENTS_XTD_SALT = b"today-was-a-day-when-i-finally-found-a-pen"
+COMMENTS_XTD_CONFIRM_EMAIL = True  # Set to False to disable confirmation
+# COMMENTS_XTD_THREADED_EMAILS = False  # other backend send email
+COMMENTS_XTD_MAX_THREAD_LEVEL = 3  # nested level
+COMMENTS_XTD_LIST_ORDER = ('-thread_id', 'order')
+COMMENTS_XTD_APP_MODEL_OPTIONS = {
+    'default': {
+        'allow_flagging': False,
+        'allow_feedback': False,
+        'show_feedback': False,
+    },
+    'books.book': {
+        'allow_flagging': False,
+        'allow_feedback': False,
+        'show_feedback': False,
+    },
+}
+COMMENTS_XTD_MODEL = 'novel.comments.models.CustomComment'
+COMMENTS_XTD_FORM_CLASS = 'novel.comments.forms.CustomCommentForm'
+
+
 # FIXTURES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#fixture-dirs

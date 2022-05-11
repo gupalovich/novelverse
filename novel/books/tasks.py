@@ -49,6 +49,7 @@ def clean_success_result_tasks(self):
 @celery_app.task(bind=True)
 def scrape_book_info_task(self, book_id):
     """Scrape initial info about the book from webnovel(default)"""
+    """TODO: Tests"""
     try:
         book = Book.objects.get(pk=book_id)
         book_scraper = BookScraper()
@@ -70,6 +71,7 @@ def scrape_book_info_task(self, book_id):
 @celery_app.task(bind=True)
 def scrape_initial_book_chapters_task(self, book_id):
     """Get book chap_ids - Create chapters until lock reached"""
+    """TODO: Tests"""
     try:
         book = Book.objects.get(pk=book_id)
         if book.chapters_count:
@@ -100,6 +102,8 @@ def scrape_initial_book_chapters_task(self, book_id):
 
 @celery_app.task(bind=True)
 def scrape_book_chapters_revisit_task(self, book_id):
+    """Revisit external novel source if not revisited and revisit_id"""
+    """TODO: Tests"""
     try:
         book = Book.objects.get(pk=book_id)
         book_scraper = BookScraper()
@@ -147,6 +151,7 @@ def scrape_book_chapters_revisit_task(self, book_id):
 @celery_app.task(bind=True, ignore_result=True)
 def update_book_revisited_task(self):
     """Update revisited field on books with status=0(ongoing)"""
+    """TODO: Tests"""
     try:
         books = Book.objects.filter(status_release=0)  # ongoing novels
         books.update(revisited=False)
@@ -163,7 +168,8 @@ def update_book_revisited_task(self):
 
 @celery_app.task(bind=True, ignore_result=True)
 def add_book_revisit_tasks(self):
-    """Filter books with revisited=False/revisit_id=True; Add task to revisit"""
+    """Filter books by revisited=False/revisit_id=True; Add task to revisit"""
+    """TODO: Tests"""
     try:
         books = Book.objects.filter(revisited=False).exclude(revisit_id__iexact='')
         schedule, _ = IntervalSchedule.objects.get_or_create(
@@ -172,8 +178,6 @@ def add_book_revisit_tasks(self):
             if not book.chapters_count or not book.visited:
                 continue
             salt = uuid.uuid4().hex[:12]
-            book.revisited = True
-            book.save()
             PeriodicTask.objects.create(
                 name=f'Revisit book chapters: {book.title} : {salt} ',
                 task='novel.books.tasks.scrape_book_chapters_revisit_task',
@@ -195,6 +199,7 @@ def add_book_revisit_tasks(self):
 
 @celery_app.task(bind=True, ignore_result=True)
 def update_book_ranking_task(self):
+    """TODO: Tests"""
     try:
         books = Book.objects.published().order_by('-votes')
         for i, book in enumerate(books, start=1):

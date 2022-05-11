@@ -230,17 +230,19 @@ class BookScraper:
                 continue
             for pg in parags:
                 pg = pg.strip()
-                pg_letters = re.sub(r'[^a-zA-Z]+', '', pg.lower())
                 if not pg:
                     continue
+                pg_letters = re.sub(r'[^a-zA-Z]+', '', pg.lower())
                 if 'pandanovel' in pg_letters:
                     pg = self.panda_remove_watermarks(pg)
+                    if not pg:
+                        continue
                     pg_letters = re.sub(r'[^a-zA-Z]+', '', pg.lower())  # double check
                     if 'pandanovel' in pg_letters:
                         with open('chap_watermarks.txt', 'a', encoding='utf-8') as f:
                             f.write(pg + '\n')
 
-                if re.search(r"\[.*?\]", pg) or re.search(r"\*.*?\*", pg):  # between [] and **
+                if re.search(r"^\[.*?\]$", pg) or re.search(r"^\*.*?\*$", pg):  # between [] **
                     chap_content += f'<p><b>{pg}</b></p>'
                 else:
                     chap_content += f'<p>{pg}</p>'

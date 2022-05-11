@@ -130,6 +130,7 @@ class BookScraperTest(TestCase):
             'Chapter 1: Testing the Dragon Form',
             'Chapter 29: 29. Testing the Dragon Form',
             'Chapter 842: Chapter 836: Testing the Dragon Form',
+            '798 Chapter 792: Testing the Dragon Form'
             'Chapter 59 - Volume 1: Testing the Dragon Form',
             'Chapter 41 Testing the Dragon Form',
             'Chapter 736 - Testing the Dragon Form',

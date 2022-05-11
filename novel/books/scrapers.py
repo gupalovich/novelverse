@@ -260,6 +260,7 @@ class BookScraper:
         patterns = [
             r'chapter.*\d+[:.\s].*\d+[.:]',
             r'chapter.*\d+[:.\s]',
+            r'^\d+.*chapter.*\d+',
             r'^\d+[:.\s]',
             r'^\d+.*[-]',
         ]

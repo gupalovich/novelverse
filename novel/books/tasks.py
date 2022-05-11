@@ -107,7 +107,7 @@ def scrape_book_chapters_revisit_task(self, book_id):
     try:
         book = Book.objects.get(pk=book_id)
         book_scraper = BookScraper()
-        if not book.revisit_id or book.revisited:
+        if not book.revisit_id:
             return None
         if book.revisit == 'webnovel':
             pass
@@ -186,6 +186,8 @@ def add_book_revisit_tasks(self):
                 one_off=True,
                 args=json.dumps([book.pk]),
             )
+            book.revisited = True
+            book.save(update_fields=['revisited'])
     except Exception as e:
         save_celery_result(
             task_id=self.request.id,

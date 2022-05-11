@@ -11,8 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from fake_useragent import UserAgent
 
-# from .models import Book, BookChapter, BookTag  # comment to execute '__main__'
-# from .utils import *  # comment to execute '__main__'
+from .utils import multiple_replace
 
 
 class BookScraper:
@@ -225,7 +224,7 @@ class BookScraper:
         chap_content_raw = self.sel_find_css(driver, '.novel-content div', many=True)
         chap_content = ''
         for p_raw in chap_content_raw:
-            parags = p_raw.text.split('\n')  # content split in </br>
+            parags = p_raw.text.replace('â\x80¦', '').split('\n')  # content split in </br>
             if not parags:
                 continue
             for pg in parags:
@@ -271,7 +270,7 @@ class BookScraper:
                 title = re.split(pattern, title, maxsplit=1)
                 title = title[1] if len(title) == 2 else title[0]
                 break
-        if title.startswith('-') or title.startswith(':') or title.startswith('.'):
+        if title.startswith('-') or title.startswithfro(':') or title.startswith('.'):
             title = title[1:]
         return title.strip()
 

@@ -94,7 +94,7 @@ def capitalize_slug(slug):
     return re.sub(r'\d', '', ' '.join([w.capitalize() for w in slug.split('-')])).strip()
 
 
-def multiple_replace(to_repl, text):
+def multiple_replace(to_repl: dict, text: str) -> str:
     rep = dict((re.escape(k), v) for k, v in to_repl.items())
     pattern = re.compile("|".join(rep.keys()))
     text = pattern.sub(lambda m: rep[re.escape(m.group(0))], text)

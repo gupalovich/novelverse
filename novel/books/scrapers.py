@@ -270,7 +270,7 @@ class BookScraper:
                 title = re.split(pattern, title, maxsplit=1)
                 title = title[1] if len(title) == 2 else title[0]
                 break
-        if title.startswith('-') or title.startswithfro(':') or title.startswith('.'):
+        if title.startswith('-') or title.startswith(':') or title.startswith('.'):
             title = title[1:]
         return title.strip()
 

@@ -1,7 +1,6 @@
 import logging
 import re
 
-from django.utils.text import slugify
 from datetime import datetime
 from requests_html import HTMLSession
 from selenium import webdriver
@@ -10,8 +9,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from fake_useragent import UserAgent
-
-from .utils import multiple_replace
 
 
 class BookScraper:

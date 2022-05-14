@@ -1,0 +1,10 @@
+Test book tasks
+Front page add 'hot books' - filtered by book.chapters_count
+Redis cashing on Windows
+Change Library page responsive layout
+Book make chapters_release dynamic
+Refactor User app
+Library add book.updated marker
+Remove comment link
+Test book signals
+Refactor book model tests

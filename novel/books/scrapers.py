@@ -94,7 +94,7 @@ class BookScraper:
             volume_len += book_volumes[-1]
             if volume_len - 1 != chap_len:
                 book_volumes.append(volume_len)
-        driver.close()
+        driver.quit()
         return book_volumes
 
     def webnovel_get_chap_ids(self, book_url: str, s_from=0, s_to=0) -> list:
@@ -108,7 +108,7 @@ class BookScraper:
         if s_to:
             c_list = c_list[s_from:s_to]
         c_ids = [li.get_attribute("data-cid") for li in c_list]
-        driver.close()
+        driver.quit()
         return c_ids
 
     def webnovel_get_chap(self, chap_url: str) -> dict:
@@ -151,7 +151,7 @@ class BookScraper:
                 'c_comments': chap_commments,
                 'c_origin': 'webnovel',
             })
-        driver.close()
+        driver.quit()
         return chap_data
 
     def panda_get_chap_ids(self, book_url: str) -> list:
@@ -169,6 +169,7 @@ class BookScraper:
                     chaps.append(chap)
             except StaleElementReferenceException:
                 continue
+        driver.quit()
         return chaps
 
     def panda_remove_watermarks(self, text: str) -> str:
@@ -250,6 +251,7 @@ class BookScraper:
             'c_next': chap_next,
             'c_origin': 'pandanovel',
         })
+        driver.quit()
         return chap_data
 
     def slice_bookchapter_title(self, title):

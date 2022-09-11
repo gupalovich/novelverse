@@ -1,4 +1,5 @@
 import logging
+import time
 import re
 
 from datetime import datetime
@@ -214,6 +215,8 @@ class BookScraper:
         chap_data = {}
         driver = webdriver.Chrome(options=self.driver_opts)
         driver.get(chap_url)
+        """TODO CLOUDFLARE CHECK"""
+        time.sleep(5)
         self.sel_wait_until(driver, '.novel-content')
         chap_title_raw = self.sel_find_css(driver, '.novel-content h2').text
         chap_title = self.slice_bookchapter_title(chap_title_raw).replace('&amp;', '&')

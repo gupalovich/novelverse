@@ -1,100 +1,142 @@
-# Novel
+# NovelVerse    [![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
 
-Website for reading webnovels
 
-[![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
-[![Black code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+> Автоматизированное приложение веб-новел.
 
-License: MIT
+> Версия: 1.2.0
 
-## Settings
+
+## Настройки `config/settings`
 
 Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings.html).
 
-## Basic Commands
+## Жизненный цикл
 
-### Setting Up Your Users
+TODO
 
--   To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
+## Модели
 
--   To create a **superuser account**, use this command:
-
-        $ python manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
+TODO
 
 ### Type checks
 
 Running type checks with mypy:
 
     $ mypy novel
+    
+    
+### Тестовое покрытие
 
-### Test coverage
-
-To run the tests, check your test coverage, and generate an HTML coverage report:
+Команды для запуска тестов, проверки покрытия unit-тестамы, генерация HTML-отчета:
 
     $ coverage run -m pytest
     $ coverage html
     $ open htmlcov/index.html
 
-#### Running tests with pytest
+
+### Тестирование
 
     $ pytest
+    $ pytest -s (with i/o logging)
 
-### Live reloading and Sass CSS compilation
+Тест отдельного модуля    
 
-Moved to [Live reloading and SASS compilation](https://cookiecutter-django.readthedocs.io/en/latest/developing-locally.html#sass-compilation-live-reloading).
+    $ pytest /tests/test_models.py
+    
+Тест только с декоратором `@pytest.mark.slow`
+
+    $ pytest -v -m slow
+
+Инверсия предыдущей команды - исключить тесты с декоратором `@pytest.mark.slow`)
+    
+    $ pytest -v -m "not slow" 
+
+### RabbitMQ
+
+    # Default port
+    http://localhost:15672/
+
+#### Linux install:
+
+    $ sudo apt-get install -y erlang
+    $ sudo apt-get install rabbitmq-server
+    
+    $ systemctl enable rabbitmq-server
+    $ systemctl start rabbitmq-server
+    
+    $ systemctl status rabbitmq-server
+
+
+#### Команды:
+
+    # if managment console disabled
+    $ rabbitmq-plugins enable rabbitmq_management
+  
+    # add user
+    $ rabbitmqctl add_user user1337 password
+    # change password
+    $ rabbitmqctl change_password user1337 NEWPASSWORD
+    # set role
+    $ rabbitmqctl set_user_tags user1337 administrator
+    # set permissions
+    $ rabbitmqctl set_permissions -p / user1337 ".*" ".*" ".*"
+    
+    # automaticly starts service on windows
+    $ rabbitmq-service stop  
+    $ rabbitmq-service install  
+    $ rabbitmq-service start  
+
+#### Errors:
+
+    # if node error - run as admin and navigate to rabbitmq/sbin
+    $ rabbitmq-service remove
+    $ rabbitmq-service install
+    $ rabbitmq-service start
+    
+    # if rabbitmqctl auth error
+    # navitage to %userprofile% - delete .erlang.cookie
+    # copy .erlang.cookie from C:\Windows\System32\config\systemprofile
+    # paste to %userprofile%
+
+### Redis
+
+#### Linux install
+
+        $ sudo apt-get install redis-server
+        $ redis-cli -v
+
+#### Команды
+    
+    # Redis server restart
+    $ sudo service redis-server restart
+    
+    # Redis cli basic use
+    $ redis-cli
+        set user:1 "admin"
+        get user:1
+    
+    # Start/Stop redis server
+    sudo service redis-server stop
+    sudo service redis-server start
+
+
 
 ### Celery
 
-This app comes with Celery.
+#### Запустить локально beat + 1 worker:
 
-To run a celery worker:
+    $ celery -A config.celery_app beat -S django -l info
 
-``` bash
-cd novel
-celery -A config.celery_app worker -l info
-```
+#### Запустить воркера
 
-Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
+    $ celery -A config.celery_app worker --loglevel=DEBUG/INFO
 
-### Email Server
+#### Продакшн воркер
 
-In development, it is often nice to be able to see emails that are being sent from your application. If you choose to use [MailHog](https://github.com/mailhog/MailHog) when generating the project a local SMTP server with a web interface will be available.
+    $ celery -A config.celery_app worker -l info -B -E
+    
+#### Errors
 
-1.  [Download the latest MailHog release](https://github.com/mailhog/MailHog/releases) for your OS.
-
-2.  Rename the build to `MailHog`.
-
-3.  Copy the file to the project root.
-
-4.  Make it executable:
-
-        $ chmod +x MailHog
-
-5.  Spin up another terminal window and start it there:
-
-        ./MailHog
-
-6.  Check out <http://127.0.0.1:8025/> to see how it goes.
-
-Now you have your own mail server running locally, ready to receive whatever you send it.
-
-### Sentry
-
-Sentry is an error logging aggregator service. You can sign up for a free account at <https://sentry.io/signup/?code=cookiecutter> or download and host it yourself.
-The system is set up with reasonable defaults, including 404 logging and integration with the WSGI application.
-
-You must set the DSN url in production.
-
-## Deployment
-
-The following details how to deploy this application.
-### Custom Bootstrap Compilation
-
-The generated CSS is set up with automatic Bootstrap recompilation with variables of your choice.
-Bootstrap v5 is installed using npm and customised by tweaking your variables in `static/sass/custom_bootstrap_vars`.
-
-You can find a list of available variables [in the bootstrap source](https://github.com/twbs/bootstrap/blob/main/scss/_variables.scss), or get explanations on them in the [Bootstrap docs](https://getbootstrap.com/docs/5.1/customize/sass/).
-
-Bootstrap's javascript as well as its dependencies is concatenated into a single file: `static/js/vendors.js`.
+    # if windows ValueError
+    $ set FORKED_BY_MULTIPROCESSING=1
+    

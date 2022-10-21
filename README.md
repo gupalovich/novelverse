@@ -12,11 +12,7 @@ Moved to [settings](http://cookiecutter-django.readthedocs.io/en/latest/settings
 
 ## Жизненный цикл
 
-TODO
-
-## Модели
-
-TODO
+![image](https://i.postimg.cc/XJMCWvVm/lifecycle.png)
 
 ### Type checks
 
@@ -140,3 +136,23 @@ Running type checks with mypy:
     # if windows ValueError
     $ set FORKED_BY_MULTIPROCESSING=1
     
+
+### Изображения
+
+#### Главная страница
+![image](https://i.postimg.cc/FRpxhjwB/1.png)
+
+#### Жанры
+![image](https://i.postimg.cc/NF7F34VK/3.png)
+
+#### Рейтинг
+![image](https://i.postimg.cc/VNLqDSJ9/2.png)
+
+#### Теги
+![image](https://i.postimg.cc/dQWzBdD6/4.png)
+
+#### Библиотека пользователя
+![image](https://i.postimg.cc/KcgHnVSG/5.png)
+
+#### Глава книги
+![image](https://i.postimg.cc/HnG3ZYDp/6.png)

@@ -146,7 +146,7 @@ Running type checks with mypy:
 ![image](https://i.postimg.cc/NF7F34VK/3.png)
 
 #### Рейтинг
-![image](https://i.postimg.cc/VNLqDSJ9/2.png)
+![image](https://i.postimg.cc/fyWzx4zB/2.png)
 
 #### Теги
 ![image](https://i.postimg.cc/dQWzBdD6/4.png)
